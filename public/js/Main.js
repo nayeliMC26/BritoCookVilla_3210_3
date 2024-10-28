@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Card from './card';
+import Deck from './Deck'
 
 class Main {
     constructor() {
@@ -25,6 +26,10 @@ class Main {
         this.renderer.setAnimationLoop(() => this.animate());
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
+
+        var testDeck = new Deck();
+        testDeck.createDeck();
+
     }
 
     // Our animate function
@@ -40,6 +45,7 @@ class Main {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     }
+
 }
 
 var game = new Main();
