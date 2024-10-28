@@ -16,9 +16,13 @@ class Deck {
      * @returns {Array} deck
      */
     createDeck() {
+        var A = 1;
+        var J = 11;
+        var Q = 12;
+        var K = 13;
         // Nested for-loop which loops through the suits and the values in order to create the cards
         var suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
-        var values = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
+        var values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
         // For each suit type in the array of suit types
         for (var suit of suits) {
             // For each vallue in the array of values

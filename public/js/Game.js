@@ -13,11 +13,11 @@ class Game {
     }
 
     /**
-     * 
+     * A function which removes and returns a card from the top of the deck
      * @returns {Array} comparisonPool
      */
     playCard() {
-        console.log('Play Card:')
+        //console.log('Play Card:')
         var comparisonPool = this.comparisonPool;
         // For all three player decks
         for (var i = 0; i < this.playerDecks.length; i++) {
@@ -29,17 +29,30 @@ class Game {
             comparisonPool.push(card);
         }
 
-        console.log('Comparison Pool:', comparisonPool)
+        //console.log('Comparison Pool:', comparisonPool)
         return comparisonPool;
     }
 
     /**
      * A function which creates a comparison pool and returns a winning card position
      */
-    compareCard(comparisonPool) {
-        for (var i = 0; i < this.comparisonPool.length; i++) {
-            var card = this.comparisonPool[i];
-            console.log(card);
+    compareCard() {
+        console.log(this.comparisonPool)
+        var comparisonPool = this.comparisonPool;
+
+        for (var i = 0; i < comparisonPool.length - 1; i++) {
+            var card = comparisonPool[i];
+            var nextCard = comparisonPool[i + 1];
+            var thirdCard = comparisonPool[i + 2];
+            console.log('First Card:', card)
+            console.log('Second Card:', nextCard)
+            console.log('Third Card:', thirdCard);
+            if (card.value > nextCard.value || card.value > thirdCard.value) {
+                console.log('Winning Card:', card)
+                console.log('Winning Value:', card.value)
+
+            }
+
         }
     }
 

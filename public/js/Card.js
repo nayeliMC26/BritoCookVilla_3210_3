@@ -29,6 +29,7 @@ class Card extends THREE.Mesh {
         // Assign value and suit to card object for reference (if needed)
         this.value = value;
         this.suit = suit;
+        this.deckPosition = this.deckPosition;
     }
 }
 
