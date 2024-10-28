@@ -95,21 +95,24 @@ class Deck {
         // Index 17-34
         var p2Deck = this.shuffledDeck.slice(splitDeckLength, splitDeckLength * 2);
         // Index 35-51
-        var p3Deck = this.shuffledDeck.slice(splitDeckLength * 2);
+        var p3Deck = this.shuffledDeck.slice(splitDeckLength * 2 + 1);
 
         var playerDecks = [p1Deck, p2Deck, p3Deck]
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
         console.log('Player 1 Deck:');
         p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        console.log('Player 1 Deck length:', p1Deck.length)
         console.log('--------------')
 
         console.log('Player 2 Deck:');
         p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        console.log('Player 2 Deck length:', p2Deck.length)
         console.log('--------------')
 
         console.log('Player 3 Deck:');
         p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        console.log('Player 3 Deck length:', p3Deck.length)
         console.log('--------------')
 
         return playerDecks;
