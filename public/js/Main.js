@@ -29,6 +29,8 @@ class Main {
 
         var testDeck = new Deck();
         testDeck.createDeck();
+        testDeck.shuffleDeck();
+        testDeck.splitDeck();
 
     }
 
