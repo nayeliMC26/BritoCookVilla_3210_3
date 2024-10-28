@@ -7,10 +7,10 @@ class Card extends THREE.Mesh {
 
         // Load textures based on value and suit
         const backTexture = new THREE.TextureLoader().load(
-            "./textures/cards/back.jpg"
+            "./assets/textures/cards/back.jpg"
         );
         const frontTexture = new THREE.TextureLoader().load(
-            `./textures/cards/${suit}/${value}.jpg`
+            `./assets/textures/cards/${suit}/${value}.jpg`
         )
 
         // Create materials for each side of the box: [Right, Left, Top, Bottom, Front, Back]
