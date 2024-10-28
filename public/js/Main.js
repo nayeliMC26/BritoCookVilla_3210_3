@@ -28,9 +28,6 @@ class Main {
         window.addEventListener('resize', () => this.onWindowResize(), false);
 
         var testDeck = new Deck();
-        testDeck.createDeck();
-        testDeck.shuffleDeck();
-        testDeck.splitDeck();
 
     }
 
