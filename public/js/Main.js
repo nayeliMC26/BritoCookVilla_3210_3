@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Card from './card';
-import Deck from './Deck'
+import Card from './Card';
+import Game from './Game';
 
 class Main {
     constructor() {
@@ -27,7 +27,7 @@ class Main {
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
 
-        var testDeck = new Deck();
+        var game = new Game();
 
     }
 
