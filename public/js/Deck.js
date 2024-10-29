@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import Card from './Card';
 
 class Deck {
@@ -16,7 +15,7 @@ class Deck {
      * @returns {Array} deck
      */
     createDeck() {
-        var A = 1;
+        var A = 14;
         var J = 11;
         var Q = 12;
         var K = 13;
