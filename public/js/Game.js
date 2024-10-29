@@ -83,18 +83,24 @@ class Game {
                 this.tiedCards = [i + 1];
                 this.war = false;
             } else if (cardValue === winningCardVal) {
+                // Add the tied card values into the tiedCards array
                 this.tiedCards.push(i + 1);
+                // If there is more than one "tiedCard" then war is true
                 this.war = true;
             }
         }
+        // If war is true and the length of the tied cards arrray is greater than 1 then War
         if (this.war && this.tiedCards.length > 1) {
             console.log('W A R');
             console.log('P L A Y E R S:', this.tiedCards)
+            // For every time we have to go to WAR, increment the war counter
             this.warCount++;
             this.warGame();
             return null;
         } else if (!this.war && this.warCount === 0) {
+            // If there is no current war and hasn't been any previous, just print the winningDeck of the normal round
             console.log(`Player ${winningCardDeck} wins`);
+            // Add winningCardDEck to the winning Player's deck
             this.playerWin(winningCardDeck);
         }
         return winningCardDeck
