@@ -74,7 +74,7 @@ class Game {
         for (var i = 0; i < comparisonPool.length; i++) {
             // The cardValue is whatever the value of the current card is
             var cardValue = comparisonPool[i].value;
-            console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Deck: ${this.comparisonPool[i].deck}`);
+            console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Player: ${this.comparisonPool[i].deck}`);
             // If the value of the current card is greater than that of the winningCardVal, then the winningCardVal is the value of the current card
             if (cardValue > winningCardVal) {
                 winningCardVal = cardValue;
@@ -133,7 +133,7 @@ class Game {
             if (winningCardDeck) {
                 this.playerWin(winningCardDeck);
                 console.log(`Player ${winningCardDeck} wins`);
-                console.log('Total wars:', this.warCount);
+                console.log(`Total wars: ${this.warCount}`);
             }
             // Reset the war state
             this.war = false;
@@ -152,12 +152,12 @@ class Game {
         // An array to store both the winning deck and the extra cards played during war
         // Add all cards played into the winningPool
         var winningPool = [...this.comparisonPool, ...this.warCards];
-        console.log("This player has won:", winningPool.length, "cards.")
+        console.log(`Player ${winningCardDeck} has won: ${winningPool.length} cards.`)
         // Add the winning pool to the winning Player's deck
         this.playerDecks[winningCardDeck - 1].push(...winningPool)
         // Reset the warCards array
-        this.warCards =[];
-        console.log("Player decks after win:",this.playerDecks)
+        this.warCards = [];
+        console.log("Player decks after win:", this.playerDecks)
     }
 
     /**
