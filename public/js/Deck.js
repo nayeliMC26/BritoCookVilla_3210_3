@@ -23,12 +23,13 @@ class Deck {
         // Nested for-loop which loops through the suits and the values in order to create the cards
         var suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
         var values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
+        var deck = 0;
         // For each suit type in the array of suit types
         for (var suit of suits) {
             // For each vallue in the array of values
             for (var value of values) {
                 // Create a new card
-                var card = new Card(value, suit);
+                var card = new Card(value, suit, deck);
                 // Add the new card to the deck
                 this.deck.push(card);
             }
@@ -102,20 +103,28 @@ class Deck {
             this.shuffledDeck.slice(splitDeckLength, splitDeckLength * 2),
             this.shuffledDeck.slice(splitDeckLength * 2 + 1)
         ];
+        // For each deck in our set of playerDecks
+        for(var i = 0 ; i < this.playerDecks.length ; i++){
+            var deck  = this.playerDecks[i]
+            for (var card of deck){
+                // Deck position is set to i + 1, so each card knows which deck it's in
+                card.deck = i + 1;
+            }
+        }
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
         /*console.log('P1 Deck:');
-        p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
         console.log('P1 Deck length:', p1Deck.length)
         console.log('--------------')
 
         console.log('P2 Deck:');
-        p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
         console.log('P2 Deck length:', p2Deck.length)
         console.log('--------------')
 
         console.log('P3 Deck:');
-        p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
         console.log('P3 Deck length:', p3Deck.length)
         console.log('--------------')*/
 

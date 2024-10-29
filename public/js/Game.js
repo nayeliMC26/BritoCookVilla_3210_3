@@ -32,29 +32,31 @@ class Game {
         //console.log('Comparison Pool:', comparisonPool)
         return comparisonPool;
     }
-
     /**
-     * A function which creates a comparison pool and returns a winning card position
+     * A function that takes the comparisonPool and returns the position of the card with the highest value
+     * @returns winningCardPos
      */
     compareCard() {
-        console.log(this.comparisonPool)
+        // Initial card and card positiona
+        var winningCardDeck = 0;
+        var winningCardVal = 0;
         var comparisonPool = this.comparisonPool;
-
-        for (var i = 0; i < comparisonPool.length - 1; i++) {
-            var card = comparisonPool[i];
-            var nextCard = comparisonPool[i + 1];
-            var thirdCard = comparisonPool[i + 2];
-            console.log('First Card:', card)
-            console.log('Second Card:', nextCard)
-            console.log('Third Card:', thirdCard);
-            if (card.value > nextCard.value || card.value > thirdCard.value) {
-                console.log('Winning Card:', card)
-                console.log('Winning Value:', card.value)
-
+        console.log(comparisonPool);
+        for (var i = 0; i < comparisonPool.length; i++) {
+            // The cardValue is whatever the value of the current card is
+            var cardValue = comparisonPool[i].value;
+            console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Deck: ${this.comparisonPool[i].deck}`);
+            // If the value of the current card is greater than that of the winningCardVal, then the winningCardVal is the value of the current card
+            if (cardValue > winningCardVal) {
+                winningCardVal = cardValue;
+                // The winning card deck is i + 1, since deckPosition 0 means it is in the initial deck
+                winningCardDeck = i + 1;
             }
-
         }
+        console.log('Winning Card Deck:', winningCardDeck);
+        return winningCardDeck
     }
+
 
     /**
      * A helper function to log all the cards in each deck to ensure that the correct card is being removed from the array
@@ -63,7 +65,7 @@ class Game {
         this.playerDecks.forEach((deck, i) => {
             console.log(`Player ${i + 1} Deck:`);
             deck.forEach(card => {
-                console.log(`${card.value} of ${card.suit}`);
+                console.log(`${card.value} of ${card.suit}, at position ${card.deck}`);
             });
             console.log(`Total cards for Player ${i + 1}: ${deck.length}\n`);
             console.log('');
