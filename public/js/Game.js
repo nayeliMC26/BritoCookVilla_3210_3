@@ -8,6 +8,7 @@ class Game {
         this.war = false;
         this.warCards = [];
         this.tiedCards = [];
+        this.winningPool = [];
         this.warCount = 0;
         //this.logPlayerDecks();
         this.playCard();
@@ -119,6 +120,7 @@ class Game {
         // There must be tied cards in order to start the war
         if (this.war === true && this.tiedCards.length > 1) {
             console.log('Starting War...');
+            this.warCards.push(...this.comparisonPool);
             // Play a card face-down for each player
             this.playFaceDown();
             // Reset the comparison pool to prevent infinite looping
@@ -129,6 +131,7 @@ class Game {
             var winningCardDeck = this.compareCard()
             // Once the winningCardDeck is determined, print the winner
             if (winningCardDeck) {
+                this.playerWin(winningCardDeck);
                 console.log(`Player ${winningCardDeck} wins`);
                 console.log('Total wars:', this.warCount);
             }
@@ -146,13 +149,22 @@ class Game {
      * @param {number} winningCardDeck 
      */
     playerWin(winningCardDeck) {
-
+        // An array to store both the winning deck and the extra cards played during war
+        // Add all cards played into the winningPool
+        var winningPool = [...this.comparisonPool, ...this.warCards];
+        console.log("This player has won:", winningPool.length, "cards.")
+        // Add the winning pool to the winning Player's deck
+        this.playerDecks[winningCardDeck - 1].push(...winningPool)
+        // Reset the warCards array
+        this.warCards =[];
+        console.log("Player decks after win:",this.playerDecks)
     }
 
     /**
      * A helper function to log all the cards in each deck to ensure that the correct card is being removed from the array
      */
-    logPlayerDecks() {
+    // DEBUG: Function for debugging 
+    /*logPlayerDecks() {
         this.playerDecks.forEach((deck, i) => {
             console.log(`Player ${i + 1} Deck:`);
             deck.forEach(card => {
@@ -164,7 +176,7 @@ class Game {
             console.log('');
 
         });
-    }
+    }*/
 
 
 }
