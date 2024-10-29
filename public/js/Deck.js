@@ -103,9 +103,9 @@ class Deck {
             this.shuffledDeck.slice(splitDeckLength * 2 + 1)
         ];
         // For each deck in our set of playerDecks
-        for(var i = 0 ; i < this.playerDecks.length ; i++){
-            var deck  = this.playerDecks[i]
-            for (var card of deck){
+        for (var i = 0; i < this.playerDecks.length; i++) {
+            var deck = this.playerDecks[i]
+            for (var card of deck) {
                 // Deck position is set to i + 1, so each card knows which deck it's in
                 card.deck = i + 1;
             }
@@ -129,8 +129,6 @@ class Deck {
 
         return this.playerDecks;
     }
-
-
 }
 
 

@@ -10,10 +10,29 @@ class Game {
         this.tiedCards = [];
         this.winningPool = [];
         this.warCount = 0;
-        //this.logPlayerDecks();
-        this.playCard();
-        //this.logPlayerDecks();
-        this.compareCard(this.comparisonPool);
+        this.roundCount = 0;
+        this.playRound();
+
+    }
+
+    playRound() {
+        console.log(`Round: ${this.roundCount} Start`)
+        while (this.playerDecks.length > 1) {
+            this.playCard();
+            this.compareCard(this.comparisonPool);
+            console.log(`Player count after round ${this.roundCount}: ${this.playerDecks.length}`);
+            console.log('')
+            this.comparisonPool = [];
+            this.removePlayer()
+            this.roundCount++
+            console.log(`Round: ${this.roundCount} Start`)
+
+            if (this.playerDecks.length === 1) {
+                this.endGame();
+                return;
+            }
+        }
+        console.log("Player decks after round:", this.playerDecks)
     }
 
     /**
@@ -70,10 +89,11 @@ class Game {
         var comparisonPool = this.comparisonPool;
         this.tiedCards = [];
         this.war = false;
-        console.log(comparisonPool);
+        console.log(`Comparison Pool: ${comparisonPool.length}`);
         for (var i = 0; i < comparisonPool.length; i++) {
             // The cardValue is whatever the value of the current card is
-            var cardValue = comparisonPool[i].value;
+            var card = comparisonPool[i];
+            var cardValue = card.value
             console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Player: ${this.comparisonPool[i].deck}`);
             // If the value of the current card is greater than that of the winningCardVal, then the winningCardVal is the value of the current card
             if (cardValue > winningCardVal) {
@@ -91,6 +111,7 @@ class Game {
         }
         // If war is true and the length of the tied cards arrray is greater than 1 then War
         if (this.war && this.tiedCards.length > 1) {
+            console.log('');
             console.log('W A R');
             console.log('P L A Y E R S:', this.tiedCards)
             // For every time we have to go to WAR, increment the war counter
@@ -135,6 +156,7 @@ class Game {
                 console.log(`Player ${winningCardDeck} wins`);
                 console.log(`Total wars: ${this.warCount}`);
             }
+            this.roundCount++;
             // Reset the war state
             this.war = false;
         }
@@ -151,13 +173,37 @@ class Game {
     playerWin(winningCardDeck) {
         // An array to store both the winning deck and the extra cards played during war
         // Add all cards played into the winningPool
-        var winningPool = [...this.comparisonPool, ...this.warCards];
-        console.log(`Player ${winningCardDeck} has won: ${winningPool.length} cards.`)
-        // Add the winning pool to the winning Player's deck
-        this.playerDecks[winningCardDeck - 1].push(...winningPool)
-        // Reset the warCards array
-        this.warCards = [];
-        console.log("Player decks after win:", this.playerDecks)
+        if (winningCardDeck > 0 && winningCardDeck <= this.playerDecks.length) {
+            this.playerDecks.length
+            var winningPool = [...this.comparisonPool, ...this.warCards];
+            console.log(`Player ${winningCardDeck} has won: ${winningPool.length} cards.`)
+            // Add the winning pool to the winning Player's deck
+            this.playerDecks[winningCardDeck - 1].push(...winningPool)
+            // Reset the warCards array
+            this.comparisonPool = [];
+            this.warCards = [];
+            console.log("Player decks after win:", this.playerDecks)
+        }
+    }
+
+    //GAAAAAAAAHHHHHHHHHHH
+    removePlayer() {
+        for (var i = this.playerDecks.length - 1; i >= 0; i--) {
+            var playerDeck = this.playerDecks[i];
+            //WYH IS EVERYTHING BROKEN
+            if (playerDeck.length === 0) {
+                console.log(`Player ${i + 1} Removed`)
+                this.playerDecks.splice(i, 1);
+            }
+        }
+
+    }
+
+
+    endGame() {
+        if (this.playerDecks.length === 1) {
+            console.log('Game Over')
+        }
     }
 
     /**
