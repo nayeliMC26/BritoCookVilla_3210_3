@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import Deck from './Deck';
 
 class Game {
