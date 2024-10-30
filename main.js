@@ -74,7 +74,9 @@ class Main {
         this.card.position.set(-14, 0, 0);
         this.card.lookAt(0, 0, 0);
         this.card.translateY(0.0079 / 2);
-        this.card2.translateY(0.0079 + 0.0079 / 2);
+        this.card2.position.set(14, 0, 0);
+        this.card2.lookAt(0, 0, 0);
+        this.card2.translateY(0.0079 / 2);
         this.scene.add(this.card);
         this.scene.add(this.card2);
 
@@ -96,7 +98,7 @@ class Main {
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-        // this.act = true;
+        this.act = true;
         this.act2 = true;
         // this.act2 = true;
 
@@ -107,11 +109,10 @@ class Main {
     animate(time) {
         this.controls.update();
         if (this.act) {
-            this.act = this.Animations.flipCard(this.card2, time, true);
-            this.act2 = !this.act;
+            this.act = this.Animations.flipCard('ONE', this.card, time, true);
         }
         if (this.act2) {
-            this.act2 = this.Animations.flipCard("ONE", this.card, time);
+            this.act2 = this.Animations.flipCard('TWO', this.card2, time);
         }
         this.renderer.render(this.scene, this.camera);
     }
