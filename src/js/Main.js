@@ -15,8 +15,10 @@ class Main {
         this.renderer.setAnimationLoop((time) => this.animate(time));
         document.body.appendChild(this.renderer.domElement);
 
+        this.clock = new THREE.Clock();
+
         this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000)
-        this.camera.position.set(0, 40, 50);
+        this.camera.position.set(0, 30, 50);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
@@ -30,8 +32,8 @@ class Main {
         this.scene.add(axisHelper);
 
 
-        const testCard = new Card('3', 'diamonds');
-        this.scene.add(testCard);
+        // const testCard = new Card('3', 'diamonds');
+        // this.scene.add(testCard);
 
         // Temporary table top
         const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
@@ -41,25 +43,42 @@ class Main {
         this.scene.add(tableTop);
 
         // Temporary Cards
-        const geometry = new THREE.BoxGeometry(2.5, 0.0079, 3.5);
+        const geometry = new THREE.BoxGeometry(2.5, 0.05, 3.5);
         const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const material2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
         const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const material4 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const material5 = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        const material6 = new THREE.MeshBasicMaterial({ color: 0x00ffff });
         this.card = new THREE.Mesh(geometry, material);
         this.card2 = new THREE.Mesh(geometry, material2);
         this.card3 = new THREE.Mesh(geometry, material3);
+        this.card4 = new THREE.Mesh(geometry, material4);
+        this.card5 = new THREE.Mesh(geometry, material5);
+        this.card6 = new THREE.Mesh(geometry, material6);
         // this.card.position.set(-14, 0.01 / 2, 0);
-        this.card.position.set(-14, 1.00395, 0);
+        this.card.position.set(-14, 0.025, 0);
         this.card.rotateY(-Math.PI / 2);
         // this.card2.position.set(14, 0.01, 0);
-        this.card2.position.set(-14, 1.01185, 0);
+        this.card2.position.set(-14, 0.075, 0);
         this.card2.rotateY(Math.PI / 2);
-        this.card3.position.set(0, 0.01 / 2, -14);
+        this.card3.position.set(-14, 0.125, 0);
         // this.card3.position.set(-4, 0.01, 0);
-        // this.card3.rotateY(Math.PI / 2);
+        this.card3.rotateY(Math.PI / 2);
+        this.card4.rotateY(-Math.PI / 2);
+        this.card4.position.set(-14, 0.175, 0);
+        // this.card2.position.set(14, 0.01, 0);
+        this.card5.position.set(-14, 0.225, 0);
+        this.card5.rotateY(Math.PI / 2);
+        this.card6.position.set(-14, 0.275, 0);
+        // this.card3.position.set(-4, 0.01, 0);
+        this.card6.rotateY(Math.PI / 2);
         this.scene.add(this.card);
         this.scene.add(this.card2);
         this.scene.add(this.card3);
+        this.scene.add(this.card4);
+        this.scene.add(this.card5);
+        this.scene.add(this.card6);
 
         // Line to test paths
         this.testPath = new THREE.CatmullRomCurve3([
@@ -78,18 +97,32 @@ class Main {
         // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keydown(event), false);
         this.test = true
 
         var testDeck = new Deck();
+        this.t1 = false;
+        this.t2 = false;
+        this.t3 = false;
+        this.t4 = false;
+        this.t5 = false;
+        this.t6 = false;
 
     }
 
     // Our animate function
     animate(time) {
-        if (this.test) {
-            this.test = this.Animations.war("TWO", this.card2, this.card, time);
-        }
         this.controls.update();
+        if (this.t1) {
+            this.t1 = this.Animations.flipCard("ONE", this.card6, time);
+        }
+        if (this.t2) {
+            this.t2 = this.Animations.war("ONE", this.card5, this.card4, time);
+        }
+        if (this.t3) {
+            this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
+        }
+       
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -98,6 +131,31 @@ class Main {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+    }
+
+    keydown(event) {
+        console.log(event.keyCode);
+        switch (event.keyCode) {
+            case 49:
+                this.t1 = true;
+                break;
+            case 50:
+                this.t2 = true;
+                break;
+            case 51:
+                this.t3 = true;
+                break;
+            case 52:
+                this.t4 = true;
+                break;
+            case 53:
+                this.t5 = true;
+                break;
+            case 54:
+                this.t6 = true;
+                break;
+        }
 
     }
 

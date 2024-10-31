@@ -12,20 +12,22 @@ export class Animations {
             number: 'ONE',
             object: "",
             path: "",
+            time: 0,
             flipPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(-14, 0, 0),
                 new THREE.Vector3(-9, 3, 0),
-                new THREE.Vector3(-4, 0.00395, 0)
+                new THREE.Vector3(-4, 0.025, 0)
             ]),
             drawPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(-14, 0, 0),
                 new THREE.Vector3(-11.5, 3, 0),
-                new THREE.Vector3(-9, 0.00395, 0)
+                new THREE.Vector3(-9, 0.025, 0)
             ]),
             // Used to track when the animation stars to loop
             index: -1,
             // Tracks the depth o fthe stack location (where is going to end up)
-            stack: 0.00395,
+            flippedStack: 0.025,
+            stack: 0.025,
             // Color of line used for debbuging 
             color: 0xff0000
         };
@@ -35,15 +37,16 @@ export class Animations {
             flipPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(14, 0, 0),
                 new THREE.Vector3(9, 3, 0),
-                new THREE.Vector3(4, 0.00395, 0)
+                new THREE.Vector3(4, 0.025, 0)
             ]),
             drawPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(14, 0, 0),
                 new THREE.Vector3(11.5, 3, 0),
-                new THREE.Vector3(9, 0.00395, 0)
+                new THREE.Vector3(9, 0.025, 0)
             ]),
             index: -1,
-            stack: 0.00395,
+            flippedStack: 0.025,
+            stack: 0.025,
             color: 0x0000ff
         };
         // Information to animate player three
@@ -52,20 +55,21 @@ export class Animations {
             flipPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(0, 0, -14),
                 new THREE.Vector3(0, 3, -9),
-                new THREE.Vector3(0, 0.00395, -4)
+                new THREE.Vector3(0, 0.025, -4)
             ]),
             drawPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(0, 0, -14),
                 new THREE.Vector3(0, 3, -11.5),
-                new THREE.Vector3(0, 0.00395, -9)
+                new THREE.Vector3(0, 0.025, -9)
             ]),
             index: -1,
-            stack: 0.00395,
+            flippedStack: 0.025,
+            stack: 0.025,
             color: 0x00ff00
         };
     }
     // Will move the card and flip it 
-    flipCard(player, object, time, war) {
+    flipCard(player, object, time) {
         // Which player are we moving the card for
         player = this.#getPlayer(player);
 
@@ -74,6 +78,7 @@ export class Animations {
         }
         // if this is the first call of the funtion
         if (player.index === -1) {
+            player.time = time;
             // Set the start of the path to the objects location
             player.flipPath.points[0] = (object.position.clone());
             // Line use for debugging 
@@ -83,7 +88,7 @@ export class Animations {
             this.scene.add(line);
         }
         // Index used to track where were moving the object to (the percentage of the path)
-        const currIndex = (time / 400 % 4) / 4;
+        const currIndex = ((time - player.time) / 400 % 4) / 4;
         // If the animation has not started to loop
         if (currIndex > player.index) {
             // Get the vertex at the current index
@@ -110,11 +115,10 @@ export class Animations {
         object.rotation.z = Math.PI;
         // Reseting the player index
         player.index = -1;
-        // If theres a war increase the stack height else reset it
-        player.stack = war ? player.stack += 0.01 : 0.01;
         // Retunr false to stop animation
         return false;
     }
+
     war(player, object1, object2, time) {
         player = this.#getPlayer(player);
         if (player === undefined) {
@@ -123,7 +127,7 @@ export class Animations {
 
         // if this is the first call of the funtion
         if (player.index === -1) {
-            console.log(player.number);
+            player.time = time;
             player.object = object1;
             player.inWar = true;
             // Set the start of the path to the objects location
@@ -134,11 +138,10 @@ export class Animations {
             const mat = new THREE.LineBasicMaterial({ color: player.color });
             const line = new THREE.Line(geo, mat);
             this.scene.add(line);
-            console.log(player.path)
         } else if (player.index === -2) {
-            console.log(player.number);
             player.object = object2;
             player.inWar = false;
+            player.flippedStack += 0.05;
             // Set the start of the path to the objects location
             player.flipPath.points[0] = (player.object.position.clone());
             player.path = player.flipPath;
@@ -147,11 +150,9 @@ export class Animations {
             const mat = new THREE.LineBasicMaterial({ color: player.color });
             const line = new THREE.Line(geo, mat);
             this.scene.add(line);
-            console.log("test -2")
         }
-        console.log(player.path);
         // Index used to track where were moving the object to (the percentage of the path)
-        const currIndex = (time / 400 % 4) / 4;
+        const currIndex = ((time - player.time) / 400 % 4) / 4;
         // If the animation has not started to loop
         if (currIndex > player.index) {
             // Get the vertex at the current index
@@ -174,7 +175,8 @@ export class Animations {
         // Move object to the end of the line
         player.object.position.copy(player.path.getPointAt(1));
         // Move object to the correct height of the stack
-        player.object.position.y = 0.00395;
+        player.object.position.y = player.inWar ? player.stack : player.flippedStack;
+        player.stack = player.inWar ? player.stack += 0.0079 : player.stack;
         // Make sure the object is flipped correctly
         player.object.rotation.z = player.inWar ? 0 : Math.PI;
         // Reseting the player index
@@ -196,5 +198,63 @@ export class Animations {
                 console.log("ERROR! Unknown Player Number: ", player);
                 break;
         }
+    }
+
+    resetPlayer() {
+        this.playerOne = {
+            number: 'ONE',
+            object: "",
+            path: "",
+            flipPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-14, 0, 0),
+                new THREE.Vector3(-9, 3, 0),
+                new THREE.Vector3(-4, 0.025, 0)
+            ]),
+            drawPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-14, 0, 0),
+                new THREE.Vector3(-11.5, 3, 0),
+                new THREE.Vector3(-9, 0.025, 0)
+            ]),
+            // Used to track when the animation stars to loop
+            index: -1,
+            // Tracks the depth o fthe stack location (where is going to end up)
+            flippedStack: 0.025,
+            // Color of line used for debbuging 
+            color: 0xff0000
+        };
+        // Informataion to animate player two
+        this.playerTwo = {
+            number: 'TWO',
+            flipPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(14, 0, 0),
+                new THREE.Vector3(9, 3, 0),
+                new THREE.Vector3(4, 0.025, 0)
+            ]),
+            drawPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(14, 0, 0),
+                new THREE.Vector3(11.5, 3, 0),
+                new THREE.Vector3(9, 0.025, 0)
+            ]),
+            index: -1,
+            flippedStack: 0.025,
+            color: 0x0000ff
+        };
+        // Information to animate player three
+        this.playerThree = {
+            number: 'THREE',
+            flipPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, -14),
+                new THREE.Vector3(0, 3, -9),
+                new THREE.Vector3(0, 0.025, -4)
+            ]),
+            drawPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, -14),
+                new THREE.Vector3(0, 3, -11.5),
+                new THREE.Vector3(0, 0.025, -9)
+            ]),
+            index: -1,
+            flippedStack: 0.025,
+            color: 0x00ff00
+        };
     }
 }

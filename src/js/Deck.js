@@ -71,11 +71,11 @@ class Deck {
         this.shuffledDeck = deck;
 
         // DEBUG: Log all the cards to ensure they are being shuffled 
-        this.shuffledDeck.forEach(card => {
-            console.log(`${card.value} of ${card.suit}`);
-        });
-        console.log('--------------');
-        console.log('');
+        // this.shuffledDeck.forEach(card => {
+        //     console.log(`${card.value} of ${card.suit}`);
+        // });
+        // console.log('--------------');
+        // console.log('');
 
         // Return the shuffledDeck
         return this.shuffledDeck;
@@ -100,17 +100,17 @@ class Deck {
         var playerDecks = [p1Deck, p2Deck, p3Deck]
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
-        console.log('Player 1 Deck:');
-        p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 1 Deck:');
+        // p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
-        console.log('Player 2 Deck:');
-        p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 2 Deck:');
+        // p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
-        console.log('Player 3 Deck:');
-        p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 3 Deck:');
+        // p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
         return playerDecks;
     }
