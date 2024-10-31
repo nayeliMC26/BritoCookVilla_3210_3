@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Animations } from './Animations.js';
-import Card from './card';
-import Deck from './Deck'
+import Card from './Card.js';
+import Deck from './Deck.js'
 
 class Main {
     constructor() {
@@ -34,10 +34,10 @@ class Main {
         this.scene.add(testCard);
 
         // Temporary table top
-        const tableTopGeometry = new THREE.CircleGeometry(18, 40);
-        const tableTopMaterial = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
+        const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
+        const tableTopMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
         const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
-        tableTop.rotateX(Math.PI / 2);
+        tableTop.translateY(-1.75 / 2)
         this.scene.add(tableTop);
 
         // Temporary Cards
@@ -48,21 +48,24 @@ class Main {
         this.card = new THREE.Mesh(geometry, material);
         this.card2 = new THREE.Mesh(geometry, material2);
         this.card3 = new THREE.Mesh(geometry, material3);
-        this.card.position.set(-14, 0.01 / 2, 0);
+        // this.card.position.set(-14, 0.01 / 2, 0);
+        this.card.position.set(-14, 1.00395, 0);
         this.card.rotateY(-Math.PI / 2);
-        this.card2.position.set(14, 0.01, 0);
+        // this.card2.position.set(14, 0.01, 0);
+        this.card2.position.set(-14, 1.01185, 0);
         this.card2.rotateY(Math.PI / 2);
         this.card3.position.set(0, 0.01 / 2, -14);
-        this.card3.rotateY(Math.PI);
+        // this.card3.position.set(-4, 0.01, 0);
+        // this.card3.rotateY(Math.PI / 2);
         this.scene.add(this.card);
         this.scene.add(this.card2);
         this.scene.add(this.card3);
 
         // Line to test paths
         this.testPath = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(0, 0.0079, -14),
-            new THREE.Vector3(0, 3, -9),
-            new THREE.Vector3(0, 0, -4)
+            new THREE.Vector3(-14, 0, 0),
+            new THREE.Vector3(-11.5, 3, 0),
+            new THREE.Vector3(-9, 0, 0)
         ]);
         const geo = new THREE.BufferGeometry().setFromPoints(this.testPath.getPoints(50));
         const mat = new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -75,13 +78,17 @@ class Main {
         // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
+        this.test = true
 
         var testDeck = new Deck();
 
     }
 
     // Our animate function
-    animate() {
+    animate(time) {
+        if (this.test) {
+            this.test = this.Animations.war("TWO", this.card2, this.card, time);
+        }
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }

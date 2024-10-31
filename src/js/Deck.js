@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Card from './card';
+import Card from './Card';
 
 class Deck {
     constructor() {
