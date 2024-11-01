@@ -111,3 +111,5 @@ export class Animations {
         }
     }
 }
+
+export default Animations;

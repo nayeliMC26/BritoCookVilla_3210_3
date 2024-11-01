@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Animations from './Animations';
 import Card from './Card';
 import Game from './Game';
 
