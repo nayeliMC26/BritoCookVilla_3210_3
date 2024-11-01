@@ -110,7 +110,8 @@ export class Animations {
         // Move object to the end of the line
         object.position.copy(player.flipPath.getPointAt(1));
         // Move object to the correct height of the stack
-        object.position.y = player.stack;
+        object.position.y = player.flippedStack;
+        player.flippedStack += 0.05;
         // Make sure the object is flipped correctly
         object.rotation.z = Math.PI;
         // Reseting the player index
@@ -141,7 +142,6 @@ export class Animations {
         } else if (player.index === -2) {
             player.object = object2;
             player.inWar = false;
-            player.flippedStack += 0.05;
             // Set the start of the path to the objects location
             player.flipPath.points[0] = (player.object.position.clone());
             player.path = player.flipPath;
@@ -176,7 +176,12 @@ export class Animations {
         player.object.position.copy(player.path.getPointAt(1));
         // Move object to the correct height of the stack
         player.object.position.y = player.inWar ? player.stack : player.flippedStack;
-        player.stack = player.inWar ? player.stack += 0.0079 : player.stack;
+        if (player.inWar){
+            player.stack += 0.05
+        } else {
+            player.flippedStack += 0.05
+        }
+        // player.stack = player.inWar ? player.stack += 0.0079 : player.stack;
         // Make sure the object is flipped correctly
         player.object.rotation.z = player.inWar ? 0 : Math.PI;
         // Reseting the player index
