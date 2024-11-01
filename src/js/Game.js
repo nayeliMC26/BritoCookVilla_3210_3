@@ -1,4 +1,4 @@
-import Deck from './Deck';
+import {Deck} from './Deck';
 
 class Game {
     constructor() {

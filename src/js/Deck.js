@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import Card from './Card';
 
-class Deck {
-    constructor() {
+export class Deck {
+    constructor(scene) {
+        this.scene = scene;
         this.deck = [];
         this.shuffledDeck = [];
         this.playerDecks = [];
@@ -21,29 +22,40 @@ class Deck {
         var Q = 12;
         var K = 13;
         // Nested for-loop which loops through the suits and the values in order to create the cards
-        var suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
-        var values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
-        var deck = 0;
+        this.suits = ["clubs", "diamonds", "hearts", "spades"];
+        this.values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
+        this.deck = [];
+        var deckPos = 0;
+
+        var zPosition = -10;
+        var zOffset = 0.5;
+
+
         // For each suit type in the array of suit types
-        for (var suit of suits) {
+        for (var suit of this.suits) {
             // For each vallue in the array of values
-            for (var value of values) {
+            for (var value of this.values) {
                 // Create a new card
-                var card = new Card(value, suit, deck);
-                // Add the new card to the deck
+                var card = new Card(value, suit, deckPos);
+                card.position.z = zPosition;
+                card.position.y = 1;
                 this.deck.push(card);
+                zPosition += zOffset;
             }
         }
 
+
         // DEBUG: Log all the cards to ensure the initial deck is being properly made 
-        /*this.deck.forEach(card => {
+        this.deck.forEach(card => {
             console.log(`${card.value} of ${card.suit}`);
         });
         console.log('--------------');
-        console.log('');*/
+        console.log('');
         // Return the created deck
         return this.deck;
     }
+
+
 
     /**
      * A function to shuffle the initial deck
@@ -126,7 +138,14 @@ class Deck {
 
         return this.playerDecks;
     }
+
+    addToScene() {
+        this.deck.forEach(card => {
+            this.scene.add(card);
+        });
+    }
 }
+
 
 
 
