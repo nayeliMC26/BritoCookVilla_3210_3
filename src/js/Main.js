@@ -35,8 +35,8 @@ class Main {
         this.game = new Game();
 
 
-        // const testCard = new Card('3', 'diamonds');
-        // this.scene.add(testCard);
+        const testCard = new Card('3', 'diamonds', 0);
+        this.scene.add(testCard);
 
         // Temporary table top
         const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
