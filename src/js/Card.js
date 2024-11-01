@@ -18,12 +18,12 @@ class Card extends THREE.Mesh {
 
         // Create materials for each side of the box: [Right, Left, Top, Bottom, Front, Back]
         const materials = [
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Right side
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Left side
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Top side
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Bottom side
-            new THREE.MeshBasicMaterial({ map: frontTexture }), // Front face
-            new THREE.MeshBasicMaterial({ map: backTexture }), // Back face
+            new THREE.MeshPhongMaterial({ color: 0xffffff }), // Right side
+            new THREE.MeshPhongMaterial({ color: 0xffffff }), // Left side
+            new THREE.MeshPhongMaterial({ color: 0xffffff }), // Top side
+            new THREE.MeshPhongMaterial({ color: 0xffffff }), // Bottom side
+            new THREE.MeshPhongMaterial({ map: frontTexture }), // Front face
+            new THREE.MeshPhongMaterial({ map: backTexture }), // Back face
         ];
 
         // Pass geometry and materials to the super constructor

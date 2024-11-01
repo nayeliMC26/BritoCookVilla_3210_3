@@ -141,6 +141,8 @@ export class Deck {
 
     addToScene() {
         this.deck.forEach(card => {
+            card.castShadow = true;
+            card.receiveShadow = true;
             this.scene.add(card);
         });
     }
