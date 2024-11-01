@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import Card from './Card';
 
 class Deck {
@@ -77,12 +78,11 @@ class Deck {
         this.shuffledDeck = deck;
 
         // DEBUG: Log all the cards to ensure they are being shuffled 
-        /*console.log('Shuffled Deck:')
-        this.shuffledDeck.forEach(card => {
-            console.log(`${card.value} of ${card.suit}`);
-        });
-        console.log('--------------');
-        console.log('');*/
+        // this.shuffledDeck.forEach(card => {
+        //     console.log(`${card.value} of ${card.suit}`);
+        // });
+        // console.log('--------------');
+        // console.log('');
 
         // Return the shuffledDeck
         return this.shuffledDeck;
@@ -112,14 +112,17 @@ class Deck {
         }
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
-        /*for (var i = 0; i < this.playerDecks.length; i++) {
-            console.log(`P${i + 1} Deck:`); // Log player number
-            this.playerDecks[i].forEach(card =>
-                console.log(`${card.value} of ${card.suit}, at position ${card.deck}`)
-            );
-            console.log(`P${i + 1} Deck length:`, this.playerDecks[i].length); // Correctly reference the length
-            console.log('--------------');
-        }*/
+        // console.log('Player 1 Deck:');
+        // p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
+
+        // console.log('Player 2 Deck:');
+        // p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
+
+        // console.log('Player 3 Deck:');
+        // p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
         return this.playerDecks;
     }
