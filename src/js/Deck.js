@@ -1,10 +1,11 @@
 import * as THREE from "three";
-import Card from './card';
+import Card from './Card';
 
 class Deck {
     constructor() {
         this.deck = [];
         this.shuffledDeck = [];
+        this.playerDecks = [];
         this.createDeck();
         this.shuffleDeck();
         this.splitDeck();
@@ -15,19 +16,25 @@ class Deck {
      * @returns {Array} deck
      */
     createDeck() {
+        var A = 14;
+        var J = 11;
+        var Q = 12;
+        var K = 13;
         // Nested for-loop which loops through the suits and the values in order to create the cards
         var suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
-        var values = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
+        var values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
+        var deck = 0;
         // For each suit type in the array of suit types
         for (var suit of suits) {
             // For each vallue in the array of values
             for (var value of values) {
                 // Create a new card
-                var card = new Card(value, suit);
+                var card = new Card(value, suit, deck);
                 // Add the new card to the deck
                 this.deck.push(card);
             }
         }
+
         // DEBUG: Log all the cards to ensure the initial deck is being properly made 
         /*this.deck.forEach(card => {
             console.log(`${card.value} of ${card.suit}`);
@@ -71,11 +78,11 @@ class Deck {
         this.shuffledDeck = deck;
 
         // DEBUG: Log all the cards to ensure they are being shuffled 
-        this.shuffledDeck.forEach(card => {
-            console.log(`${card.value} of ${card.suit}`);
-        });
-        console.log('--------------');
-        console.log('');
+        // this.shuffledDeck.forEach(card => {
+        //     console.log(`${card.value} of ${card.suit}`);
+        // });
+        // console.log('--------------');
+        // console.log('');
 
         // Return the shuffledDeck
         return this.shuffledDeck;
@@ -90,32 +97,38 @@ class Deck {
         var players = 3;
         // This is the length of each player deck, determined by the number of players 
         var splitDeckLength = Math.floor(this.shuffledDeck.length / players);
-        // Index 0-16
-        var p1Deck = this.shuffledDeck.slice(0, splitDeckLength);
-        // Index 17-34
-        var p2Deck = this.shuffledDeck.slice(splitDeckLength, splitDeckLength * 2);
-        // Index 35-51
-        var p3Deck = this.shuffledDeck.slice(splitDeckLength * 2);
-
-        var playerDecks = [p1Deck, p2Deck, p3Deck]
+        this.playerDecks = [
+            this.shuffledDeck.slice(0, splitDeckLength),
+            this.shuffledDeck.slice(splitDeckLength, splitDeckLength * 2),
+            this.shuffledDeck.slice(splitDeckLength * 2 + 1)
+        ];
+        // For each deck in our set of playerDecks
+        for (var i = 0; i < this.playerDecks.length; i++) {
+            var deck = this.playerDecks[i]
+            for (var card of deck) {
+                // Deck position is set to i + 1, so each card knows which deck it's in
+                card.deck = i + 1;
+            }
+        }
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
-        console.log('Player 1 Deck:');
-        p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 1 Deck:');
+        // p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
-        console.log('Player 2 Deck:');
-        p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 2 Deck:');
+        // p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
-        console.log('Player 3 Deck:');
-        p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
-        console.log('--------------')
+        // console.log('Player 3 Deck:');
+        // p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}`));
+        // console.log('--------------')
 
-        return playerDecks;
+        return this.playerDecks;
     }
-
-
 }
+
+
+
 
 export default Deck;
