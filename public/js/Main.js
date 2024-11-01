@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Animations } from './Animations.js';
-import Card from './card';
-import Deck from './Deck'
+import Card from './Card';
+import Game from './Game';
 
 class Main {
     constructor() {
@@ -76,9 +75,25 @@ class Main {
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
 
-        var testDeck = new Deck();
+        this.game = new Game();
+        this.keyHandler = this.keyHandler.bind(this);
+        document.addEventListener("keydown", this.keyHandler, false);
+
 
     }
+  
+    keyHandler(e) {
+        switch (e.keyCode) {
+            case 78:
+                    this.game.playCard()
+                    this.game.compareCard()
+                    break;
+
+        }
+    }
+
+
+
 
     // Our animate function
     animate() {
