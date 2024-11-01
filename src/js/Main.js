@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Animations } from './Animations.js';
 import Card from './Card.js';
-import Deck from './Deck.js'
+import Deck from './Deck.js';
+import Game from './Game.js';
 
 class Main {
     constructor() {
@@ -30,6 +31,8 @@ class Main {
 
         const axisHelper = new THREE.AxesHelper(5);
         this.scene.add(axisHelper);
+
+        this.game = new Game();
 
 
         // const testCard = new Card('3', 'diamonds');
@@ -122,7 +125,7 @@ class Main {
         if (this.t3) {
             this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
         }
-       
+
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -135,7 +138,6 @@ class Main {
     }
 
     keydown(event) {
-        console.log(event.keyCode);
         switch (event.keyCode) {
             case 49:
                 this.t1 = true;
@@ -154,6 +156,11 @@ class Main {
                 break;
             case 54:
                 this.t6 = true;
+                break;
+
+            case 78:
+                this.game.playCard()
+                this.game.compareCard()
                 break;
         }
 
