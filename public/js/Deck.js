@@ -112,20 +112,14 @@ class Deck {
         }
 
         // DEBUG: Ensure that each player deck is composed of pre-existing cards in pre-existing card order of the shuffledDeck
-        /*console.log('P1 Deck:');
-        p1Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
-        console.log('P1 Deck length:', p1Deck.length)
-        console.log('--------------')
-
-        console.log('P2 Deck:');
-        p2Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
-        console.log('P2 Deck length:', p2Deck.length)
-        console.log('--------------')
-
-        console.log('P3 Deck:');
-        p3Deck.forEach(card => console.log(`${card.value} of ${card.suit}, at position ${card.deck}`));
-        console.log('P3 Deck length:', p3Deck.length)
-        console.log('--------------')*/
+        /*for (var i = 0; i < this.playerDecks.length; i++) {
+            console.log(`P${i + 1} Deck:`); // Log player number
+            this.playerDecks[i].forEach(card =>
+                console.log(`${card.value} of ${card.suit}, at position ${card.deck}`)
+            );
+            console.log(`P${i + 1} Deck length:`, this.playerDecks[i].length); // Correctly reference the length
+            console.log('--------------');
+        }*/
 
         return this.playerDecks;
     }

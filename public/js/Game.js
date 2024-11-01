@@ -10,48 +10,67 @@ class Game {
         this.tiedCards = [];
         this.winningPool = [];
         this.warCount = 0;
-        this.roundCount = 0;
-        this.playRound();
-
+        this.roundCount = 1;
     }
-
-    playRound() {
-        console.log(`Round: ${this.roundCount} Start`)
+    // a function that plays the rounds until there is one player deck left 
+    /*playGame() {
         while (this.playerDecks.length > 1) {
+            this.roundCount++;
+            console.log(this.roundCount)
             this.playCard();
-            this.compareCard(this.comparisonPool);
-            console.log(`Player count after round ${this.roundCount}: ${this.playerDecks.length}`);
+            var winner = this.compareCard();
+            console.log(`Player count after round ${this.roundCount + 1}: ${this.playerDecks.length}`);
             console.log('')
+            if (winner !== null) {
+                this.playerWin(winner);
+            }
+            this.removePlayer();
             this.comparisonPool = [];
-            this.removePlayer()
-            this.roundCount++
-            console.log(`Round: ${this.roundCount} Start`)
-
             if (this.playerDecks.length === 1) {
                 this.endGame();
-                return;
+                break;
+            }
+            /*if (this.roundCount >= 20) {
+                this.endGame();
+                console.log('Round limit reached. Game Over.');
+                break;
             }
         }
-        console.log("Player decks after round:", this.playerDecks)
-    }
+    }*/
 
     /**
      * A function which removes and returns a card from the top of the deck
      * @returns {Array} comparisonPool
      */
     playCard() {
-        //console.log('Play Card:')
-        var comparisonPool = this.comparisonPool;
-        // For all three player decks
-        for (var i = 0; i < this.playerDecks.length; i++) {
-            // The current player deck is the deck at the current index of the array of playerDecks
-            var playerDeck = this.playerDecks[i];
-            // If there are cards remaining in the playerDeck
-            if (playerDeck.length > 0) {
-                // Return and remove the first card in the array from each playerDeck
-                var card = playerDeck.shift();
-                // Add these cards to a comparison pool which is an array of cards
-                comparisonPool.push(card);
+
+        if (this.playerDecks.length === 1) {
+            this.playerWin(this.playerDecks[0].length)
+            this.endGame()
+            return null;
+        }
+        console.log("Round", this.roundCount)
+        this.roundCount++
+        if (this.playerDecks.length > 1) {
+            this.comparisonPool = [];
+            //console.log('Play Card:')
+            var comparisonPool = this.comparisonPool;
+            // For all three player decks
+            for (var i = 0; i < this.playerDecks.length; i++) {
+                // The current player deck is the deck at the current index of the array of playerDecks
+                var playerDeck = this.playerDecks[i];
+                // If there are cards remaining in the playerDeck
+                if (playerDeck.length > 0) {
+                    // Return and remove the first card in the array from each playerDeck
+                    var card = playerDeck.shift();
+                    // Add these cards to a comparison pool which is an array of cards
+                    comparisonPool.push(card);
+                }
+                else {
+                    console.log(`Player ${i + 1} Removed`)
+                    this.playerDecks.splice(i, 1);
+                    i--;
+                }
             }
         }
         //console.log('Comparison Pool:', comparisonPool)
@@ -93,18 +112,19 @@ class Game {
         for (var i = 0; i < comparisonPool.length; i++) {
             // The cardValue is whatever the value of the current card is
             var card = comparisonPool[i];
+            var playerIndex = i + 1;
             var cardValue = card.value
-            console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Player: ${this.comparisonPool[i].deck}`);
+            console.log(`Card: ${this.comparisonPool[i].value}, Suit: ${this.comparisonPool[i].suit}, Player: ${playerIndex}`);
             // If the value of the current card is greater than that of the winningCardVal, then the winningCardVal is the value of the current card
             if (cardValue > winningCardVal) {
                 winningCardVal = cardValue;
                 // The winning card deck is i + 1, since deckPosition 0 means it is in the initial deck
-                winningCardDeck = i + 1;
-                this.tiedCards = [i + 1];
+                winningCardDeck = playerIndex;
+                this.tiedCards = [playerIndex];
                 this.war = false;
-            } else if (cardValue === winningCardVal) {
+            } else if (cardValue == winningCardVal) {
                 // Add the tied card values into the tiedCards array
-                this.tiedCards.push(i + 1);
+                this.tiedCards.push(playerIndex);
                 // If there is more than one "tiedCard" then war is true
                 this.war = true;
             }
@@ -114,16 +134,15 @@ class Game {
             console.log('');
             console.log('W A R');
             console.log('P L A Y E R S:', this.tiedCards)
-            // For every time we have to go to WAR, increment the war counter
-            this.warCount++;
             this.warGame();
             return null;
-        } else if (!this.war && this.warCount === 0) {
+        } else if (!this.war) {
             // If there is no current war and hasn't been any previous, just print the winningDeck of the normal round
-            console.log(`Player ${winningCardDeck} wins`);
+            console.log(`Player ${winningCardDeck} wins this round`);
             // Add winningCardDEck to the winning Player's deck
             this.playerWin(winningCardDeck);
         }
+
         return winningCardDeck
     }
 
@@ -141,6 +160,7 @@ class Game {
         // There must be tied cards in order to start the war
         if (this.war === true && this.tiedCards.length > 1) {
             console.log('Starting War...');
+            this.warCount++;
             this.warCards.push(...this.comparisonPool);
             // Play a card face-down for each player
             this.playFaceDown();
@@ -152,11 +172,17 @@ class Game {
             var winningCardDeck = this.compareCard()
             // Once the winningCardDeck is determined, print the winner
             if (winningCardDeck) {
-                this.playerWin(winningCardDeck);
-                console.log(`Player ${winningCardDeck} wins`);
-                console.log(`Total wars: ${this.warCount}`);
+                if (this.playerDecks.length > 1) {
+                    this.playerWin(winningCardDeck);
+                    console.log(`Player ${winningCardDeck} wins`);
+                    console.log(`Total wars: ${this.warCount}`);
+                    console.log('');
+                    this.comparisonPool = [];
+                    this.warCards = [];
+                }
+            } else if (this.playerDecks.length === 1) {
+                this.endGame();
             }
-            this.roundCount++;
             // Reset the war state
             this.war = false;
         }
@@ -183,6 +209,8 @@ class Game {
             this.comparisonPool = [];
             this.warCards = [];
             console.log("Player decks after win:", this.playerDecks)
+            console.log(`Player count after round ${this.roundCount - 1}: ${this.playerDecks.length}`);
+            console.log('');
         }
     }
 
@@ -190,9 +218,9 @@ class Game {
     removePlayer() {
         for (var i = this.playerDecks.length - 1; i >= 0; i--) {
             var playerDeck = this.playerDecks[i];
-            //WYH IS EVERYTHING BROKEN
-            if (playerDeck.length === 0) {
+            if (playerDeck.length <= 0) {
                 console.log(`Player ${i + 1} Removed`)
+                this.comparisonPool.push(...playerDeck);
                 this.playerDecks.splice(i, 1);
             }
         }
@@ -201,8 +229,9 @@ class Game {
 
 
     endGame() {
-        if (this.playerDecks.length === 1) {
+        if (this.playerDecks.length == 1) {
             console.log('Game Over')
+            return null;
         }
     }
 
@@ -220,7 +249,7 @@ class Game {
             console.log('');
             console.log('');
             console.log('');
-
+ 
         });
     }*/
 

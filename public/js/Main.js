@@ -27,9 +27,24 @@ class Main {
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
 
-        var game = new Game();
+        this.game = new Game();
+        this.keyHandler = this.keyHandler.bind(this);
+        document.addEventListener("keydown", this.keyHandler, false);
+
 
     }
+    keyHandler(e) {
+        switch (e.keyCode) {
+            case 78:
+                    this.game.playCard()
+                    this.game.compareCard()
+                    break;
+
+        }
+    }
+
+
+
 
     // Our animate function
     animate() {
