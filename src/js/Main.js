@@ -138,7 +138,6 @@ class Main {
     }
 
     keydown(event) {
-        console.log(event.keyCode);
         switch (event.keyCode) {
             case 49:
                 this.t1 = true;
