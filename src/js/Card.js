@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 class Card extends THREE.Mesh {
-    constructor(value, suit) {
+    constructor(value, suit, deck) {
         // Build geometry (2.5 by 3.5 inches)
         const geometry = new THREE.BoxGeometry(2.5, 3.5, 0.01);
 
@@ -29,6 +29,7 @@ class Card extends THREE.Mesh {
         // Assign value and suit to card object for reference (if needed)
         this.value = value;
         this.suit = suit;
+        this.deck = deck;
     }
 }
 
