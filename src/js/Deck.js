@@ -32,7 +32,6 @@ class Deck {
         }
         // DEBUG: Ensure that we are initially creating a deck of 52 cards
         // console.log(`Deck created with ${this.cards.length} cards.`);
-
     }
     /**
      * A function to shuffle the initial deck
@@ -114,6 +113,8 @@ class Deck {
      */
     addToScene() {
         this.cards.forEach(card => {
+            card.castShadow = true;
+            card.receiveShadow = true;
             this.scene.add(card);
         });
         // DEBUG: Make sure all cards are being added to the scene
