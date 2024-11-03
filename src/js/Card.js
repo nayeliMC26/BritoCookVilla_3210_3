@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 class Card extends THREE.Mesh {
-    constructor(value, suit, deck) {
+    constructor(value, suit) {
         // Build geometry (2.5 by 3.5 inches)
         const geometry = new THREE.BoxGeometry(2.5, 3.5, 0.01);
 
@@ -12,7 +12,7 @@ class Card extends THREE.Mesh {
         backTexture.colorSpace = THREE.SRGBColorSpace;
         
         const frontTexture = new THREE.TextureLoader().load(
-            `./public/assets/textures/cards/${suit}/${value}.png`
+            `./public/assets/textures/cards/${suit}/${value}.PNG`
         )
         frontTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -32,7 +32,6 @@ class Card extends THREE.Mesh {
         // Assign value and suit to card object for reference (if needed)
         this.value = value;
         this.suit = suit;
-        this.deck = deck;
     }
 }
 

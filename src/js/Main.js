@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Animations } from './Animations.js';
-import Card from './Card.js';
-import Deck from './Deck.js';
 import Game from './Game.js';
 
 class Main {
@@ -32,11 +30,8 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         this.scene.add(axisHelper);
 
-        this.game = new Game();
-
-
-        const testCard = new Card('3', 'diamonds', 0);
-        this.scene.add(testCard);
+        //const testCard = new Card('3', 'diamonds', 0);
+        //this.scene.add(testCard);
 
         // Temporary table top
         const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
@@ -46,7 +41,7 @@ class Main {
         this.scene.add(tableTop);
 
         // Temporary Cards
-        const geometry = new THREE.BoxGeometry(2.5, 0.05, 3.5);
+        const geometry = new THREE.BoxGeometry(2.5, 0.02, 3.5);
         const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const material2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
         const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -97,20 +92,21 @@ class Main {
         // Object to call different animations
         this.Animations = new Animations(this.scene);
 
-        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.game = new Game(this.scene);
+        console.log('Game initialized:', this.game, '\n\n');
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keydown(event), false);
         this.test = true
 
-        var testDeck = new Deck();
+        /*var testDeck = new Deck(this.scene);
         this.t1 = false;
         this.t2 = false;
         this.t3 = false;
         this.t4 = false;
         this.t5 = false;
         this.t6 = false;
-
+*/
     }
 
     // Our animate function
@@ -159,8 +155,12 @@ class Main {
                 break;
 
             case 78:
-                this.game.playCard()
-                this.game.compareCard()
+                if (this.game.gameActive) {
+                    this.game.playRound();
+                    this.game.compareCard();
+                } else {
+                    console.log("The game has ended. You cannot play anymore.");
+                }
                 break;
         }
 
