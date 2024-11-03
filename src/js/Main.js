@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Animations } from './Animations.js';
 import { Deck } from './Deck.js';
+import Game from './Game.js'
 
 class Main {
     constructor() {
@@ -40,6 +41,8 @@ class Main {
         var deck = new Deck(this.scene);
         deck.addToScene();
 
+        this.game = new Game();
+
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
         this.scene.add(this.ambientLight);
 
@@ -50,7 +53,7 @@ class Main {
         this.scene.add(this.pointLight)
 
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight)
-        this.scene.add(this.pointLightHelper, 1.0)
+        //this.scene.add(this.pointLightHelper, 1.0)
 
 
 

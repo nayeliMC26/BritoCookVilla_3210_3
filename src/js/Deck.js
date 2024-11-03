@@ -46,11 +46,11 @@ export class Deck {
 
 
         // DEBUG: Log all the cards to ensure the initial deck is being properly made 
-        this.deck.forEach(card => {
+        /*this.deck.forEach(card => {
             console.log(`${card.value} of ${card.suit}`);
         });
         console.log('--------------');
-        console.log('');
+        console.log('');*/
         // Return the created deck
         return this.deck;
     }
