@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import Deck from './Deck';
 
 class Game {
@@ -31,6 +32,20 @@ class Game {
         this.initDeck.shuffleDeck();
         // Creat4e player decks by initializing new deck objects
         this.playerDecks = this.initPlayers();
+        this.removeLeftoverCard();
+        // Create a list of vectors for player positions
+        var playerPositions = [
+            // Player 1 position
+            new THREE.Vector3(-14, 0, 0),
+            // Player 2 position 
+            new THREE.Vector3(14, 0, 0),
+            // Player 3 position
+            new THREE.Vector3(0, 0, -14)
+        ];
+        // For each player, set the playerDeck's position
+        this.playerDecks.forEach((deck, index) => {
+            deck.setPosition(playerPositions[index]);
+        });
 
     }
 
@@ -49,6 +64,12 @@ class Game {
             var playerDeck = new Deck(this.scene, i + 1);
             // Deal the cards to the playerDecks
             playerDeck.addCards(this.initDeck.dealCards(cardsPerPlayer));
+            // Rotate Player 3's deck to face the appropriate direction
+            if (i === 2) {
+                playerDeck.cards.forEach(card => {
+                    card.rotation.set(Math.PI / 2, 0, 0);
+                })
+            }
             // Add the playerDecks to the players
             players.push(playerDeck);
         }
@@ -264,6 +285,13 @@ class Game {
             return true;
         }
         return false;
+    }
+
+    /**
+     * A function to handle the leftover card that will always exist after dealing playerDecks
+     */
+    removeLeftoverCard() {
+        this.initDeck.cards = [];
     }
 
 

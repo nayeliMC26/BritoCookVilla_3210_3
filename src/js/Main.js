@@ -95,10 +95,6 @@ class Main {
         this.game = new Game(this.scene);
         console.log('Game initialized:', this.game, '\n\n');
 
-
-
-        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keydown(event), false);
         this.test = true

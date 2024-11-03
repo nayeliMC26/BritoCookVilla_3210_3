@@ -5,6 +5,7 @@ class Deck {
         this.scene = scene;
         this.cards = [];
         this.playerId = playerId;
+        this.position = { x: 0, y: 0, z: 0 };
         // DEBUG: Make sure all decks are initialized 
         // console.log(`Deck initialized for Player ${playerId ?? 'Initial Deck'}`);
 
@@ -68,11 +69,28 @@ class Deck {
     }
 
     /**
+     * A function which takes in an initial position for the dekcs and moves them
+     * @param {*} position 
+     */
+    setPosition(position) {
+        this.position = position; 
+        this.cards.forEach((card, index) => {
+            card.position.x = position.x;
+            // Slight offset to mimic "stack" effect on deck
+            card.position.y = position.y + index * 0.015;;
+            card.position.z = position.z; 
+            card.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+
+        });
+    }
+
+    /**
      * A function to add cards to a players deck whether it be for dealing or in-game actions
      * @param {*} newCards 
      */
     addCards(newCards) {
         this.cards.push(...newCards);
+        this.addToScene();
         // DEBUG: Check how many cards are being added to a players deck
         // console.log(`Added ${newCards.length} cards to Player ${this.playerId ?? 'Main Deck'}. Total cards now: ${this.cards.length}`);
     }
@@ -90,7 +108,10 @@ class Deck {
         // If there are not any cards remaining in the player's, do not draw 
         return null;
     }
-
+    
+    /**
+     * A function which adds each card into the scene
+     */
     addToScene() {
         this.cards.forEach(card => {
             this.scene.add(card);
