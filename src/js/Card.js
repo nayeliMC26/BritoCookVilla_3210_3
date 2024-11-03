@@ -12,7 +12,7 @@ class Card extends THREE.Mesh {
         backTexture.colorSpace = THREE.SRGBColorSpace;
         
         const frontTexture = new THREE.TextureLoader().load(
-            `./public/assets/textures/cards/${suit}/${value}.png`
+            `./public/assets/textures/cards/${suit}/${value}.PNG`
         )
         frontTexture.colorSpace = THREE.SRGBColorSpace;
 
