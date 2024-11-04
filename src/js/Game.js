@@ -6,6 +6,7 @@ class Game {
         this.scene = scene;
         // Game variables
         this.comparisonPool = [];
+        this.winningPool = [];
         this.warCards = [];
         this.winningPlayerId = null;
         // Counters
@@ -48,7 +49,7 @@ class Game {
             // Rotate Player 3's deck to face the appropriate direction
             if (index === 2) {
                 deck.cards.forEach(card => {
-                    card.rotation.set(Math.PI / 2, 0, 0);
+                    card.rotation.set(0, Math.PI, 0);
                 })
             }
         });
@@ -97,6 +98,7 @@ class Game {
         console.log('R O U N D:', this.roundCount + 1)
         // Initialize empty array to hold cards to compare 
         this.comparisonPool = [];
+        this.warCards = [];
         // Do a check to make sure there are more than one players in the game
         if (this.checkGameState()) return;
         // FOr each player in the array of playerDecks
@@ -119,7 +121,8 @@ class Game {
         }
         // Round has ended, increment the count
         this.roundCount++
-        return this.comparisonPool;
+        this.compareCard();
+        return this.winningPool;
     }
     /**
      * A function that takes the comparisonPool and returns the position of the card with the highest value
@@ -217,22 +220,22 @@ class Game {
     playerWin(winningPlayerId) {
         if (this.comparisonPool.length > 0 || this.warCards.length > 0) {
             // Add all cards played into the winningPool including compared cards and fallen player cards
-            var winningPool = [...this.comparisonPool, ...this.warCards];
-            console.log(`Player ${winningPlayerId} has won: ${winningPool.length} cards.`)
+            this.winningPool = [...this.comparisonPool, ...this.warCards];
+            console.log(`Player ${winningPlayerId} has won: ${this.winningPool.length} cards.`)
             // For each playerDeck in the array of players
             for (let i = 0; i < this.playerDecks.length; i++) {
                 // If the current playersId is the same as the winningPLayer's Id
                 if (this.playerDecks[i].playerId === winningPlayerId) {
                     // Add the winningPool to the winning player's deck
-                    this.playerDecks[i].addCards(winningPool);
+                    this.playerDecks[i].addCards(this.winningPool);
                 }
                 console.log("Player", this.playerDecks[i].playerId, " deck after round:", [...this.playerDecks[i].cards]);
 
 
             }
-            // Reset the warCards array and the comparisonPool
-            this.comparisonPool = [];
-            this.warCards = [];
+            // // Reset the warCards array and the comparisonPool
+            // this.comparisonPool = [];
+            // this.warCards = [];
             this.totalCardsInPlay = this.calculateTotalCards();
 
         }

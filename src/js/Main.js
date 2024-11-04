@@ -47,7 +47,7 @@ class Main {
         this.pointLight.position.set(0, 20, 20)
         this.pointLight.castShadow = true;
 
-        this.pointLight.shadow.mapSize.width = 2048; 
+        this.pointLight.shadow.mapSize.width = 2048;
         this.pointLight.shadow.mapSize.height = 2048;
 
         this.scene.add(this.pointLight)
@@ -112,12 +112,12 @@ class Main {
         this.card6.position.set(-14, 0.275, 0);
         // this.card3.position.set(-4, 0.01, 0);
         this.card6.rotateY(Math.PI / 2);
-        this.scene.add(this.card);
-        this.scene.add(this.card2);
-        this.scene.add(this.card3);
-        this.scene.add(this.card4);
-        this.scene.add(this.card5);
-        this.scene.add(this.card6);
+        // this.scene.add(this.card);
+        // this.scene.add(this.card2);
+        // this.scene.add(this.card3);
+        // this.scene.add(this.card4);
+        // this.scene.add(this.card5);
+        // this.scene.add(this.card6);
 
 
         // Line to test paths
@@ -134,37 +134,43 @@ class Main {
         // Object to call different animations
         this.Animations = new Animations(this.scene);
 
+        this.cards = [];
+        this.animationState = 'idle';
+        this.winningPlayer = 0;
+        this.cardsWon = 0;
+
         this.game = new Game(this.scene);
         console.log('Game initialized:', this.game, '\n\n');
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keydown(event), false);
-        this.test = true
 
-        /*var testDeck = new Deck(this.scene);
-        this.t1 = false;
-        this.t2 = false;
-        this.t3 = false;
-        this.t4 = false;
-        this.t5 = false;
-        this.t6 = false;
-*/
     }
 
     // Our animate function
     animate(time) {
         this.stats.begin();
         this.controls.update();
-        if (this.t1) {
-            this.t1 = this.Animations.flipCard("ONE", this.card6, time);
+        switch (this.animationState) {
+            case 'draw':
+                var i = this.Animations.flipCard("ONE", this.cards[0], time);
+                var ii = this.Animations.flipCard("TWO", this.cards[1], time);
+                var iii = this.Animations.flipCard("THREE", this.cards[2], time);
+                console.log((i || ii || iii));
+                if (!(i || ii || iii)) {
+                    this.winningPlayer = this.game.winningPlayerId;
+                    this.cardsWon = this.game.winningPool.length
+                }
+                this.animationState = (i || ii || iii) ? 'draw' : 'lift';
+                break;
+            case 'lift':
+                var id = this.winningPlayer;
+                var i = this.Animations.liftDeck(id, this.game.playerDecks[id - 1].cards.slice(0, this.cardsWon * -1), time);
+                this.animationState = (i) ? 'lift' : 'idle';
+                break;
+            case 'return':
+                break;
         }
-        if (this.t2) {
-            this.t2 = this.Animations.war("ONE", this.card5, this.card4, time);
-        }
-        if (this.t3) {
-            this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
-        }
-
         this.renderer.render(this.scene, this.camera);
         this.stats.end();
     }
@@ -179,24 +185,6 @@ class Main {
 
     keydown(event) {
         switch (event.keyCode) {
-            case 49:
-                this.t1 = true;
-                break;
-            case 50:
-                this.t2 = true;
-                break;
-            case 51:
-                this.t3 = true;
-                break;
-            case 52:
-                this.t4 = true;
-                break;
-            case 53:
-                this.t5 = true;
-                break;
-            case 54:
-                this.t6 = true;
-                break;
             case 76:
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
@@ -205,8 +193,9 @@ class Main {
                 break;
             case 78:
                 if (this.game.gameActive) {
-                    this.game.playRound();
-                    this.game.compareCard();
+                    this.cards = this.game.playRound();
+                    // this.game.compareCard();
+                    this.animationState = 'draw';
                 } else {
                     console.log("The game has ended. You cannot play anymore.");
                 }

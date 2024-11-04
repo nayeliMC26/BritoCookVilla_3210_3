@@ -10,9 +10,6 @@ export class Animations {
         // Information to annimate player one
         this.playerOne = {
             number: 'ONE',
-            object: "",
-            path: "",
-            time: 0,
             flipPath: new THREE.CatmullRomCurve3([
                 new THREE.Vector3(-14, 0, 0),
                 new THREE.Vector3(-9, 3, 0),
@@ -23,11 +20,16 @@ export class Animations {
                 new THREE.Vector3(-11.5, 3, 0),
                 new THREE.Vector3(-9, 0.025, 0)
             ]),
+            liftPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-14, 0, 0),
+                new THREE.Vector3(-14, 0.515, 0)
+            ]),
+            time: 0,
             // Used to track when the animation stars to loop
             index: -1,
             // Tracks the depth o fthe stack location (where is going to end up)
-            flippedStack: 0.025,
-            stack: 0.025,
+            flippedStack: 0.005,
+            stack: 0.005,
             // Color of line used for debbuging 
             color: 0xff0000
         };
@@ -44,9 +46,14 @@ export class Animations {
                 new THREE.Vector3(11.5, 3, 0),
                 new THREE.Vector3(9, 0.025, 0)
             ]),
+            liftPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(14, 0, 0),
+                new THREE.Vector3(14, 0.515, 0)
+            ]),
+            time: 0,
             index: -1,
-            flippedStack: 0.025,
-            stack: 0.025,
+            flippedStack: 0.005,
+            stack: 0.005,
             color: 0x0000ff
         };
         // Information to animate player three
@@ -62,18 +69,25 @@ export class Animations {
                 new THREE.Vector3(0, 3, -11.5),
                 new THREE.Vector3(0, 0.025, -9)
             ]),
+            liftPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, -14),
+                new THREE.Vector3(0, 0.515, -14)
+            ]),
+            time: 0,
             index: -1,
-            flippedStack: 0.025,
-            stack: 0.025,
+            flippedStack: 0.005,
+            stack: 0.005,
             color: 0x00ff00
         };
+        this.winningDeck = new THREE.Group();
+        this.scene.add(this.winningDeck);
     }
     // Will move the card and flip it 
     flipCard(player, object, time) {
         // Which player are we moving the card for
         player = this.#getPlayer(player);
-
-        if (player === undefined) {
+        // console.log(object);
+        if ((player === undefined) || object === undefined) {
             return false;
         }
         // if this is the first call of the funtion
@@ -111,13 +125,71 @@ export class Animations {
         object.position.copy(player.flipPath.getPointAt(1));
         // Move object to the correct height of the stack
         object.position.y = player.flippedStack;
-        player.flippedStack += 0.05;
+        player.flippedStack += 0.01;
         // Make sure the object is flipped correctly
         object.rotation.z = Math.PI;
         // Reseting the player index
         player.index = -1;
         // Retunr false to stop animation
         return false;
+    }
+
+    return(player, objects, time) {
+        // Which player are we moving the card for
+        player = this.#getPlayer(player);
+        if ((player === undefined) || objects === undefined) {
+            return false;
+        }
+
+        if (player.index === -1) {
+            player.time = time;
+            // Set the start of the path to the objects location
+            player.flipPath.points[0] = (object.position.clone());
+            // Line use for debugging 
+            const geo = new THREE.BufferGeometry().setFromPoints(player.flipPath.getPoints(50));
+            const mat = new THREE.LineBasicMaterial({ color: player.color });
+            const line = new THREE.Line(geo, mat);
+            this.scene.add(line);
+        }
+
+    }
+
+    liftDeck(player, objects, time) {
+        player = this.#getPlayer(player);
+        if ((player === undefined) || objects === undefined) {
+            return false;
+        }
+
+        if (player.index === -1) {
+            player.time = time;
+            this.winningDeck = new THREE.Group().add(...objects);
+            this.scene.add(this.winningDeck);
+            // this.winningDeck.translateY(0.515);
+
+            // Set the start of the path to the objects location
+            // player.liftPath.points[0] = (this.winningDeck.position.clone());
+            // // Line use for debugging 
+            const geo = new THREE.BufferGeometry().setFromPoints(player.liftPath.getPoints(50));
+            const mat = new THREE.LineBasicMaterial({ color: player.color });
+            const line = new THREE.Line(geo, mat);
+            this.scene.add(line);
+        }
+
+        const currIndex = ((time - player.time) / 300 % 3) / 3;
+        // If the animation has not started to loop
+        if (currIndex > player.index) {
+            // Get the vertex at the current index
+            const position = player.liftPath.getPointAt(currIndex);
+
+            // Move the object to the current index position
+            this.winningDeck.position.y = position.y;
+            // Updating the player index to the current index
+            player.index = currIndex;
+            // Return treu to keep the animation going
+            return true;
+        }
+        return false;
+
     }
 
     war(player, object1, object2, time) {
@@ -176,7 +248,7 @@ export class Animations {
         player.object.position.copy(player.path.getPointAt(1));
         // Move object to the correct height of the stack
         player.object.position.y = player.inWar ? player.stack : player.flippedStack;
-        if (player.inWar){
+        if (player.inWar) {
             player.stack += 0.05
         } else {
             player.flippedStack += 0.05
@@ -192,12 +264,16 @@ export class Animations {
 
     // Used to get the player that were doing the animation to
     #getPlayer(player) {
+
         switch (player) {
             case 'ONE':
+            case 1:
                 return this.playerOne;
             case 'TWO':
+            case 2:
                 return this.playerTwo;
             case 'THREE':
+            case 3:
                 return this.playerThree;
             default:
                 console.log("ERROR! Unknown Player Number: ", player);
