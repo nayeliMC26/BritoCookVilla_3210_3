@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { Animations } from './Animations.js';
 import Game from './Game.js';
 
 class Main {
     constructor() {
+        this.stats = new Stats();
+        document.body.appendChild(this.stats.dom);
         // Initializing the scene, renderer, and camera
         this.scene = new THREE.Scene();
 
@@ -31,10 +34,10 @@ class Main {
 
 
         const gridHelper = new THREE.GridHelper(50, 50);
-        this.scene.add(gridHelper);
+        //this.scene.add(gridHelper);
 
         const axisHelper = new THREE.AxesHelper(5);
-        this.scene.add(axisHelper);
+        //this.scene.add(axisHelper);
 
         this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
         this.scene.add(this.ambientLight);
@@ -43,6 +46,10 @@ class Main {
         this.pointLight = new THREE.PointLight(0xffffff, 10000, 0);
         this.pointLight.position.set(0, 20, 20)
         this.pointLight.castShadow = true;
+
+        this.pointLight.shadow.mapSize.width = 2048; 
+        this.pointLight.shadow.mapSize.height = 2048;
+
         this.scene.add(this.pointLight)
 
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight)
@@ -146,6 +153,7 @@ class Main {
 
     // Our animate function
     animate(time) {
+        this.stats.begin();
         this.controls.update();
         if (this.t1) {
             this.t1 = this.Animations.flipCard("ONE", this.card6, time);
@@ -158,6 +166,7 @@ class Main {
         }
 
         this.renderer.render(this.scene, this.camera);
+        this.stats.end();
     }
 
     // A function to update the projection matrix when the window is resized
@@ -202,9 +211,9 @@ class Main {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
-            case 80: 
-            this.pointLight.visible = !this.pointLight.visible
-            break;
+            case 80:
+                this.pointLight.visible = !this.pointLight.visible
+                break;
         }
 
     }

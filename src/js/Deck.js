@@ -5,7 +5,6 @@ class Deck {
         this.scene = scene;
         this.cards = [];
         this.playerId = playerId;
-        this.position = { x: 0, y: 0, z: 0 };
         // DEBUG: Make sure all decks are initialized 
         // console.log(`Deck initialized for Player ${playerId ?? 'Initial Deck'}`);
 
@@ -35,11 +34,9 @@ class Deck {
     }
     /**
      * A function to shuffle the initial deck
-     * @param {*} deck 
-     * @returns {Array} shuffledDeck
      */
-    // Implemented using Fisher-Yates algorithm
 
+    // Implemented using Fisher-Yates algorithm
     shuffleDeck() {
         // DEBUG: Make sure that the initial deck is properly being created 
         // console.log('Deck before shuffle:', this.cards.map(card => `${card.value} of ${card.suit}`).join(', '));
