@@ -39,7 +39,7 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         //this.scene.add(axisHelper);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+        this.ambientLight = new THREE.AmbientLight(0x00ffff, 1.0);
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
@@ -207,7 +207,7 @@ class Main {
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
             case 77:
-                console.log('Shadow should change')
+                this.pointLight.castShadow = !this.pointLight.castShadow
                 break;
             case 78:
                 if (this.game.gameActive) {
