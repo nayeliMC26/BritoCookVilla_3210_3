@@ -197,6 +197,12 @@ class Main {
             case 54:
                 this.t6 = true;
                 break;
+            case 65:
+                this.pointLight.position.x -= 2;
+                break;
+            case 68:
+                this.pointLight.position.x += 2;
+                break;
             case 76:
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
@@ -213,6 +219,12 @@ class Main {
                 break;
             case 80:
                 this.pointLight.visible = !this.pointLight.visible
+                break;
+            case 83:
+                this.pointLight.position.z += 2;
+                break;
+            case 87:
+                this.pointLight.position.z -= 2;
                 break;
         }
 
