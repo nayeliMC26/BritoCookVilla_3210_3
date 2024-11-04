@@ -45,6 +45,12 @@ class Game {
         // For each player, set the playerDeck's position
         this.playerDecks.forEach((deck, index) => {
             deck.setPosition(playerPositions[index]);
+            // Rotate Player 3's deck to face the appropriate direction
+            if (index === 2) {
+                deck.cards.forEach(card => {
+                    card.rotation.set(Math.PI / 2, 0, 0);
+                })
+            }
         });
 
     }
@@ -64,12 +70,6 @@ class Game {
             var playerDeck = new Deck(this.scene, i + 1);
             // Deal the cards to the playerDecks
             playerDeck.addCards(this.initDeck.dealCards(cardsPerPlayer));
-            // Rotate Player 3's deck to face the appropriate direction
-            if (i === 2) {
-                playerDeck.cards.forEach(card => {
-                    card.rotation.set(Math.PI / 2, 0, 0);
-                })
-            }
             // Add the playerDecks to the players
             players.push(playerDeck);
         }
