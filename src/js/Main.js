@@ -198,10 +198,14 @@ class Main {
                 this.t6 = true;
                 break;
             case 65:
-                this.pointLight.position.x -= 2;
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x -= 2;
+                }
                 break;
             case 68:
-                this.pointLight.position.x += 2;
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x += 2;
+                }
                 break;
             case 76:
                 this.ambientLight.visible = !this.ambientLight.visible;
@@ -213,6 +217,7 @@ class Main {
                 if (this.game.gameActive) {
                     this.game.playRound();
                     this.game.compareCard();
+                    console.log('Game state:', this.game, '\n\n');
                 } else {
                     console.log("The game has ended. You cannot play anymore.");
                 }
@@ -221,10 +226,14 @@ class Main {
                 this.pointLight.visible = !this.pointLight.visible
                 break;
             case 83:
-                this.pointLight.position.z += 2;
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z += 2;
+                }
                 break;
             case 87:
-                this.pointLight.position.z -= 2;
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z -= 2;
+                }
                 break;
         }
 

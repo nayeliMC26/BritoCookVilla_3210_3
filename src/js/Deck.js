@@ -76,7 +76,6 @@ class Deck {
             card.position.y = position.y + index * 0.015;;
             card.position.z = position.z; 
             card.rotation.set(Math.PI / 2, 0, Math.PI / 2);
-
         });
     }
 
