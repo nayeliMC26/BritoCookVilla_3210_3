@@ -201,10 +201,7 @@ class Game {
             this.comparisonPool.push(playerDeck.playCard());
         }
         // If there is only one player left after war end the game
-        if (this.playerDecks.length === 1) {
-            this.endGame();
-            return;
-        }
+        this.checkGameState();
         // Compare the cards from the new comparisonPool
         var winner = this.compareCard();
         if (winner !== null && winner < this.playerDecks.length) {
