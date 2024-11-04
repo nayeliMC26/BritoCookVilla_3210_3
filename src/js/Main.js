@@ -39,7 +39,7 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         //this.scene.add(axisHelper);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+        this.ambientLight = new THREE.AmbientLight(0x00ffff, 1.0);
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
@@ -197,22 +197,43 @@ class Main {
             case 54:
                 this.t6 = true;
                 break;
+            case 65:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x -= 2;
+                }
+                break;
+            case 68:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x += 2;
+                }
+                break;
             case 76:
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
             case 77:
-                console.log('Shadow should change')
+                this.pointLight.castShadow = !this.pointLight.castShadow
                 break;
             case 78:
                 if (this.game.gameActive) {
                     this.game.playRound();
                     this.game.compareCard();
+                    console.log('Game state:', this.game, '\n\n');
                 } else {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
             case 80:
                 this.pointLight.visible = !this.pointLight.visible
+                break;
+            case 83:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z += 2;
+                }
+                break;
+            case 87:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z -= 2;
+                }
                 break;
         }
 
