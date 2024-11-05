@@ -24,6 +24,13 @@ export class Animations {
                 new THREE.Vector3(-14, 0, 0),
                 new THREE.Vector3(-14, 0.515, 0)
             ]),
+            drawBackPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(-14, 0.005, 0),
+            ]),
+            pr: Math.PI / 2,
+            s1: 0.005,
+            count: 0,
             time: 0,
             // Used to track when the animation stars to loop
             index: -1,
@@ -50,6 +57,13 @@ export class Animations {
                 new THREE.Vector3(14, 0, 0),
                 new THREE.Vector3(14, 0.515, 0)
             ]),
+            drawBackPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(14, 0.005, 0),
+            ]),
+            pr: Math.PI / 2,
+            s1: 0.005,
+            count: 0,
             time: 0,
             index: -1,
             flippedStack: 0.005,
@@ -73,6 +87,13 @@ export class Animations {
                 new THREE.Vector3(0, 0, -14),
                 new THREE.Vector3(0, 0.515, -14)
             ]),
+            drawBackPath: new THREE.CatmullRomCurve3([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0.005, -14),
+            ]),
+            pr: Math.PI,
+            s1: 0.005,
+            count: 0,
             time: 0,
             index: -1,
             flippedStack: 0.005,
@@ -80,6 +101,7 @@ export class Animations {
             color: 0x00ff00
         };
         this.winningDeck = new THREE.Group();
+        this.currRotation = 0;
         this.scene.add(this.winningDeck);
     }
     // Will move the card and flip it 
@@ -134,26 +156,6 @@ export class Animations {
         return false;
     }
 
-    return(player, objects, time) {
-        // Which player are we moving the card for
-        player = this.#getPlayer(player);
-        if ((player === undefined) || objects === undefined) {
-            return false;
-        }
-
-        if (player.index === -1) {
-            player.time = time;
-            // Set the start of the path to the objects location
-            player.flipPath.points[0] = (object.position.clone());
-            // Line use for debugging 
-            const geo = new THREE.BufferGeometry().setFromPoints(player.flipPath.getPoints(50));
-            const mat = new THREE.LineBasicMaterial({ color: player.color });
-            const line = new THREE.Line(geo, mat);
-            this.scene.add(line);
-        }
-
-    }
-
     liftDeck(player, objects, time) {
         player = this.#getPlayer(player);
         if ((player === undefined) || objects === undefined) {
@@ -162,10 +164,6 @@ export class Animations {
 
         if (player.index === -1) {
             player.time = time;
-            this.winningDeck = new THREE.Group().add(...objects);
-            this.scene.add(this.winningDeck);
-            // this.winningDeck.translateY(0.515);
-
             // Set the start of the path to the objects location
             // player.liftPath.points[0] = (this.winningDeck.position.clone());
             // // Line use for debugging 
@@ -178,16 +176,91 @@ export class Animations {
         const currIndex = ((time - player.time) / 300 % 3) / 3;
         // If the animation has not started to loop
         if (currIndex > player.index) {
+            if (player.index === -1) player.index = 0;
             // Get the vertex at the current index
             const position = player.liftPath.getPointAt(currIndex);
+            objects.forEach((object) => {
+                // object.position.y = 0;
+                // object.trabs = + position.y
 
+                object.translateY((0.515 * currIndex) - (0.515 * player.index));
+            });
             // Move the object to the current index position
-            this.winningDeck.position.y = position.y;
             // Updating the player index to the current index
             player.index = currIndex;
             // Return treu to keep the animation going
             return true;
         }
+        player.index = -1;
+        return false;
+
+    }
+
+    drawBack(player, objects, time) {
+        player = this.#getPlayer(player);
+        if ((player === undefined) || objects === undefined) {
+            return false;
+        }
+
+
+        if (player.index === -1) {
+            console.log("drawBack");
+            player.time = time;
+            this.winningDeck = new THREE.Group().add(...objects);
+            this.scene.add(this.winningDeck);
+            player.drawBackPath.points[0] = this.winningDeck.children[player.count].position.clone();
+            this.currRotation = this.winningDeck.children[player.count].rotation.y;
+            // console.log()
+            // Set the start of the path to the objects location
+            // player.liftPath.points[0] = (this.winningDeck.position.clone());
+            // // Line use for debugging 
+            const geo = new THREE.BufferGeometry().setFromPoints(player.drawBackPath.getPoints(50));
+            const mat = new THREE.LineBasicMaterial({ color: player.color });
+            const line = new THREE.Line(geo, mat);
+            this.scene.add(line);
+        }
+
+        var currCard = this.winningDeck.children[player.count];
+        const currIndex = ((time - player.time) / 300 % 3) / 3;
+
+        if ((currIndex > player.index) && (player.count < this.winningDeck.children.length)) {
+            // Get the vertex at the current index
+            const position = player.drawBackPath.getPointAt(currIndex);
+            // Move the object to the current index position
+            currCard.position.copy(position);
+
+            if (currIndex >= 0.25) {
+                // Rotate the object (flipping)
+                // console.log(this.winningDeck.children[player.count]);
+                if ((this.currRotation % Math.PI) != player.pr) {
+                    currCard.rotation.y = (this.currRotation + (player.pr - this.currRotation)) * ((currIndex - 0.25) / 0.75);
+                }
+                console.log((this.currRotation + (player.pr - ((this.currRotation) * ((currIndex - 0.25) / 0.75)))));
+                // Math.PI * the percentage of the rest of the path
+                // object.rotation.z = Math.PI * ((currIndex - 0.25) / 0.75);
+                // object.rotation.z = Math.PI * ((currIndex - 0.25) / 0.75);
+            }
+            // Updating the player index to the current index
+            player.index = currIndex;
+            // Return treu to keep the animation going
+            return true
+        } else if (player.count < this.winningDeck.children.length - 1) {
+            console.log(player.count);
+            console.log(this.winningDeck.children.length);
+            this.winningDeck.children[player.count].position.copy(player.drawBackPath.getPointAt(1));
+            player.index = -2;
+            player.time = time;
+            player.s1 += 0.01;
+            player.count++
+            this.currRotation = this.winningDeck.children[player.count].rotation.y;
+            player.drawBackPath.points[0] = this.winningDeck.children[player.count].position.clone();
+            player.drawBackPath.points[1].y = player.s1;
+            console.log("count increase");
+            return true;
+        }
+        this.winningDeck.children[player.count].position.copy(player.drawBackPath.getPointAt(1));
+        player.index = -1;
+
         return false;
 
     }

@@ -166,9 +166,14 @@ class Main {
             case 'lift':
                 var id = this.winningPlayer;
                 var i = this.Animations.liftDeck(id, this.game.playerDecks[id - 1].cards.slice(0, this.cardsWon * -1), time);
-                this.animationState = (i) ? 'lift' : 'idle';
+                console.log(i);
+                this.animationState = (i) ? 'lift' : 'drawBack';
                 break;
-            case 'return':
+            case 'drawBack':
+                var id = this.winningPlayer;
+                var i = this.Animations.drawBack(id, this.game.winningPool, time);
+                console.log(i);
+                this.animationState = (i) ? 'drawBack' : 'idle';
                 break;
         }
         this.renderer.render(this.scene, this.camera);
@@ -185,61 +190,43 @@ class Main {
 
     keydown(event) {
         switch (event.keyCode) {
-            case 49:
-                this.t1 = true;
+            case 78: // N
+                if (this.game.gameActive && (this.animationState == 'idle')) {
+                    this.cards = this.game.playRound();
+                    // this.game.compareCard();
+                    this.animationState = 'draw';
+                } else if (this.animationState == 'idle') {
+                    console.log("The game has ended. You cannot play anymore.");
+                }
                 break;
-            case 50:
-                this.t2 = true;
+            case 87: // W
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z -= 2;
+                }
                 break;
-            case 51:
-                this.t3 = true;
-                break;
-            case 52:
-                this.t4 = true;
-                break;
-            case 53:
-                this.t5 = true;
-                break;
-            case 54:
-                this.t6 = true;
-                break;
-            case 65:
+            case 65: // A
                 if (this.pointLight.visible) {
                     this.pointLight.position.x -= 2;
                 }
                 break;
-            case 68:
-                if (this.pointLight.visible) {
-                    this.pointLight.position.x += 2;
-                }
-                break;
-            case 76:
-                this.ambientLight.visible = !this.ambientLight.visible;
-                break;
-            case 77:
-                this.pointLight.castShadow = !this.pointLight.castShadow
-                break;
-            case 78:
-                if (this.game.gameActive) {
-                    this.cards = this.game.playRound();
-                    // this.game.compareCard();
-                    this.animationState = 'draw';
-                } else {
-                    console.log("The game has ended. You cannot play anymore.");
-                }
-                break;
-            case 80:
-                this.pointLight.visible = !this.pointLight.visible
-                break;
-            case 83:
+            case 83: // S
                 if (this.pointLight.visible) {
                     this.pointLight.position.z += 2;
                 }
                 break;
-            case 87:
+            case 68: // D
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z -= 2;
+                    this.pointLight.position.x += 2;
                 }
+                break;
+            case 76: // L
+                this.ambientLight.visible = !this.ambientLight.visible;
+                break;
+            case 77: // M
+                this.pointLight.castShadow = !this.pointLight.castShadow
+                break;
+            case 80: // P
+                this.pointLight.visible = !this.pointLight.visible
                 break;
         }
 
