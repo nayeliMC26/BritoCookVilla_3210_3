@@ -9,6 +9,7 @@ Wander Brito Martinez, Samantha Cook, Nayeli Villa
 ## Resources
 
 ### Textures
+Card textures illustrated by <a href="https://github.com/scook5570" title="Samantha Cook"> Samantha Cook</a>
 
 
 ### Sounds
