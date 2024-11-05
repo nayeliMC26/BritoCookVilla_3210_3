@@ -22,7 +22,7 @@ class Game {
 
     }
     /**
-     * A function to initialize our game but initializing an initDeck and by initializing out players
+     * A function to initialize our game by initializing an initDeck and by initializing our players
      */
     initGame() {
         // Create a new Deck object

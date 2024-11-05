@@ -39,7 +39,7 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         //this.scene.add(axisHelper);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+        this.ambientLight = new THREE.AmbientLight(0x00ffff, 1.0);
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
@@ -185,11 +185,39 @@ class Main {
 
     keydown(event) {
         switch (event.keyCode) {
+            case 49:
+                this.t1 = true;
+                break;
+            case 50:
+                this.t2 = true;
+                break;
+            case 51:
+                this.t3 = true;
+                break;
+            case 52:
+                this.t4 = true;
+                break;
+            case 53:
+                this.t5 = true;
+                break;
+            case 54:
+                this.t6 = true;
+                break;
+            case 65:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x -= 2;
+                }
+                break;
+            case 68:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.x += 2;
+                }
+                break;
             case 76:
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
             case 77:
-                console.log('Shadow should change')
+                this.pointLight.castShadow = !this.pointLight.castShadow
                 break;
             case 78:
                 if (this.game.gameActive) {
@@ -202,6 +230,16 @@ class Main {
                 break;
             case 80:
                 this.pointLight.visible = !this.pointLight.visible
+                break;
+            case 83:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z += 2;
+                }
+                break;
+            case 87:
+                if (this.pointLight.visible) {
+                    this.pointLight.position.z -= 2;
+                }
                 break;
         }
 
