@@ -233,7 +233,7 @@ export class Animations {
                 // Rotate the object (flipping)
                 // console.log(this.winningDeck.children[player.count]);
                 if ((this.currRotation % Math.PI) != player.pr) {
-                    currCard.rotation.y = (this.currRotation + (player.pr - this.currRotation)) * ((currIndex - 0.25) / 0.75);
+                    currCard.rotation.y = this.currRotation + ((player.pr - this.currRotation) * ((currIndex - 0.25) / 0.75));
                 }
                 console.log((this.currRotation + (player.pr - ((this.currRotation) * ((currIndex - 0.25) / 0.75)))));
                 // Math.PI * the percentage of the rest of the path
