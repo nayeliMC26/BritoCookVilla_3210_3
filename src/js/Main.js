@@ -1,8 +1,9 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
-import { Animations } from './Animations.js';
-import Game from './Game.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module.js";
+import { Animations } from "./Animations.js";
+import Game from "./Game.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 class Main {
     constructor() {
@@ -17,21 +18,24 @@ class Main {
         this.renderer.setAnimationLoop((time) => this.animate(time));
         this.renderer.shadowMap.enabled = true;
 
-
-
         document.body.appendChild(this.renderer.domElement);
 
         this.clock = new THREE.Clock();
 
-        this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 3000)
+        this.camera = new THREE.PerspectiveCamera(
+            35,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            3000
+        );
         this.camera.position.set(0, 30, 50);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
-
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
-
+        this.controls = new OrbitControls(
+            this.camera,
+            this.renderer.domElement
+        );
 
         const gridHelper = new THREE.GridHelper(50, 50);
         //this.scene.add(gridHelper);
@@ -43,29 +47,59 @@ class Main {
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
-        this.pointLight = new THREE.PointLight(0xffffff, 10000, 0);
-        this.pointLight.position.set(0, 20, 20)
+        this.pointLight = new THREE.PointLight(0xffffff, 100, 0);
+        this.pointLight.position.set(0, 20, 20);
         this.pointLight.castShadow = true;
 
-        this.pointLight.shadow.mapSize.width = 2048; 
+        this.pointLight.shadow.mapSize.width = 2048;
         this.pointLight.shadow.mapSize.height = 2048;
 
-        this.scene.add(this.pointLight)
+        this.scene.add(this.pointLight);
 
-        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight)
+        // Initialize rotation target and flags
+        this.rotateY = 0; // Track the target Y rotation
+        this.pointLightMoving = false; // Track if point light can move
+        this.pointLightRotationTarget = null; // Track target rotation angle
+
+        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight);
         //this.scene.add(this.pointLightHelper, 1.0)
 
         //const testCard = new Card('3', 'diamonds', 0);
         //this.scene.add(testCard);
 
-        // Temporary table top
+        const video = document.createElement("video");
+        video.src = "public/assets/textures/table/tableScreen.mp4";
+        video.load();
+        video.play();
+        video.loop = true;
+        video.muted = true;
+
+        const videoTexture = new THREE.VideoTexture(video);
+
+        const blackMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+
         const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
-        const tableTopMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
-        const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
+
+        const tableTopMaterial = new THREE.MeshPhongMaterial({
+            map: videoTexture,
+            emissive: 0xffffff,
+            emissiveMap: videoTexture,
+            emissiveIntensity: 1.0,
+        });
+
+        const tableTop = new THREE.Mesh(tableTopGeometry, [
+            blackMaterial, // Bottom material (black)
+            tableTopMaterial, // Top material (with video)
+            blackMaterial, // Side material (black)
+        ]);
+
         tableTop.castShadow = true;
         tableTop.receiveShadow = true;
-        tableTop.translateY(-1.75 / 2)
+        tableTop.translateY(-1.75 / 2);
         this.scene.add(tableTop);
+
+        this.loadTableEdge();
+        this.loadDrone();
 
         // Temporary Cards
         const geometry = new THREE.BoxGeometry(2.5, 0.02, 3.5);
@@ -94,7 +128,6 @@ class Main {
         this.card6.castShadow = true;
         this.card6.receiveShadow = true;
 
-
         // this.card.position.set(-14, 0.01 / 2, 0);
         this.card.position.set(-14, 0.025, 0);
         this.card.rotateY(-Math.PI / 2);
@@ -119,14 +152,15 @@ class Main {
         this.scene.add(this.card5);
         this.scene.add(this.card6);
 
-
         // Line to test paths
         this.testPath = new THREE.CatmullRomCurve3([
             new THREE.Vector3(-14, 0, 0),
             new THREE.Vector3(-11.5, 3, 0),
-            new THREE.Vector3(-9, 0, 0)
+            new THREE.Vector3(-9, 0, 0),
         ]);
-        const geo = new THREE.BufferGeometry().setFromPoints(this.testPath.getPoints(50));
+        const geo = new THREE.BufferGeometry().setFromPoints(
+            this.testPath.getPoints(50)
+        );
         const mat = new THREE.LineBasicMaterial({ color: 0xffffff });
         const line = new THREE.Line(geo, mat);
         this.scene.add(line);
@@ -135,11 +169,15 @@ class Main {
         this.Animations = new Animations(this.scene);
 
         this.game = new Game(this.scene);
-        console.log('Game initialized:', this.game, '\n\n');
+        console.log("Game initialized:", this.game, "\n\n");
 
-        window.addEventListener('resize', () => this.onWindowResize(), false);
-        window.addEventListener('keydown', (event) => this.keydown(event), false);
-        this.test = true
+        window.addEventListener("resize", () => this.onWindowResize(), false);
+        window.addEventListener(
+            "keydown",
+            (event) => this.keydown(event),
+            false
+        );
+        this.test = true;
 
         /*var testDeck = new Deck(this.scene);
         this.t1 = false;
@@ -149,6 +187,110 @@ class Main {
         this.t5 = false;
         this.t6 = false;
 */
+    }
+
+    loadTableEdge() {
+        // Create a loader for the GLTF/GLB model
+        const loader = new GLTFLoader();
+        const textureLoader = new THREE.TextureLoader();
+
+        // Load the noise texture
+        const noiseTexture = textureLoader.load(
+            "public/assets/textures/table/noise.jpg"
+        );
+        noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping;
+        noiseTexture.repeat.set(4, 4); // Adjust tiling as needed for desired noise scale
+
+        // Path to the GLB model
+        const modelPath = "public/assets/models/TableEdge.glb";
+
+        // Load the GLB file
+        loader.load(
+            modelPath,
+            (gltf) => {
+                const model = gltf.scene;
+
+                model.scale.set(19, 19, 19); 
+
+                model.position.set(0, 0, 0);
+
+                // Traverse through each child in the model to apply metallic properties with noise
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        const originalMaterial = child.material;
+
+                        // Only modify material if it exists and is a standard or physical material
+                        if (
+                            originalMaterial &&
+                            (originalMaterial.isMeshStandardMaterial ||
+                                originalMaterial.isMeshPhysicalMaterial)
+                        ) {
+                            child.material = new THREE.MeshStandardMaterial({
+                                // Preserve original texture and emissive settings
+                                map: originalMaterial.map || null,
+                                emissive:
+                                    originalMaterial.emissive ||
+                                    new THREE.Color(0x000000),
+                                emissiveMap:
+                                    originalMaterial.emissiveMap || null,
+                                emissiveIntensity:
+                                    originalMaterial.emissiveIntensity || 1.0,
+
+                                // Apply metallic properties for a metallic appearance
+                                color:
+                                    originalMaterial.color ||
+                                    new THREE.Color(0x333333), // Base color
+                                metalness: 0.8, 
+                                roughness: 0.3,
+                                envMapIntensity: 1.0,
+
+                                // Add noise texture for a more natural metal effect
+                                roughnessMap: noiseTexture, 
+                                aoMap: noiseTexture, 
+                            });
+
+                            // Enable shadows if needed
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    }
+                });
+
+                // Add the loaded model to the scene
+                this.scene.add(model);
+            },
+            undefined,
+            (error) => {
+                console.error("Error loading GLB model:", error);
+            }
+        );
+    }
+
+    loadDrone() {
+        // Create a loader for the GLTF/GLB model
+        const loader = new GLTFLoader();
+
+        // Path to the GLB model
+        const modelPath = "public/assets/models/Drone.glb";
+
+        // Load the GLB file
+        loader.load(
+            modelPath,
+            (gltf) => {
+                const model = gltf.scene;
+
+                model.scale.set(1, 1, 1); 
+
+                model.position.set(0, 0, 0);
+
+                // Add the loaded model to the point light
+                this.pointLight.add(model);
+            },
+            undefined,
+            (error) => {
+                console.error("Error loading GLB model:", error);
+            }
+        );
     }
 
     // Our animate function
@@ -174,71 +316,68 @@ class Main {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-
     }
 
     keydown(event) {
-        switch (event.keyCode) {
-            case 49:
+        switch (event.key.toLowerCase()) {
+            case '1':
                 this.t1 = true;
                 break;
-            case 50:
+            case '2':
                 this.t2 = true;
                 break;
-            case 51:
+            case '3':
                 this.t3 = true;
                 break;
-            case 52:
+            case '4':
                 this.t4 = true;
                 break;
-            case 53:
+            case '5':
                 this.t5 = true;
                 break;
-            case 54:
+            case '6':
                 this.t6 = true;
                 break;
-            case 65:
+            case 'a':
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x -= 2;
+                    this.pointLight.position.x -= 0.5;
                 }
                 break;
-            case 68:
+            case 'd':
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x += 2;
+                    this.pointLight.position.x += 0.5;
                 }
                 break;
-            case 76:
+            case 'l':
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
-            case 77:
-                this.pointLight.castShadow = !this.pointLight.castShadow
+            case 'm':
+                this.pointLight.castShadow = !this.pointLight.castShadow;
                 break;
-            case 78:
+            case 'n':
                 if (this.game.gameActive) {
                     this.game.playRound();
                     this.game.compareCard();
-                    console.log('Game state:', this.game, '\n\n');
+                    console.log("Game state:", this.game, "\n\n");
                 } else {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
-            case 80:
-                this.pointLight.visible = !this.pointLight.visible
+            case 'p':
+                this.pointLight.visible = !this.pointLight.visible;
                 break;
-            case 83:
+            case 's':
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z += 2;
+                    this.pointLight.position.z += 0.5;
                 }
                 break;
-            case 87:
+            case 'w':
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z -= 2;
+                    this.pointLight.position.z -= 0.5;
                 }
                 break;
         }
-
     }
-
 }
 
 var game = new Main();
