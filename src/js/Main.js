@@ -23,6 +23,7 @@ class Main {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0x272727);
         this.renderer.setAnimationLoop((time) => this.animate(time));
+        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
 
         document.body.appendChild(this.renderer.domElement);
