@@ -31,12 +31,12 @@ class Main {
         this.clock = new THREE.Clock();
 
         this.camera = new THREE.PerspectiveCamera(
-            35,
+            65,
             window.innerWidth / window.innerHeight,
             0.1,
             3000
         );
-        this.camera.position.set(0, 40, 60);
+        this.camera.position.set(0, 20, 30);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
@@ -46,10 +46,10 @@ class Main {
         );
 
         // Enable auto-rotation on the controls
-        this.controls.enableDamping = true;  // Smooth transition when rotating
-        this.controls.dampingFactor = 0.25;  // Adjust damping for a smoother effect
-        this.controls.enableZoom = true;  // Enable zoom if needed
-        this.controls.autoRotate = true;  // Enable auto-rotation
+        this.controls.enableDamping = true; // Smooth transition when rotating
+        this.controls.dampingFactor = 0.25; // Adjust damping for a smoother effect
+        this.controls.enableZoom = true; // Enable zoom if needed
+        this.controls.autoRotate = true; // Enable auto-rotation
         this.controls.autoRotateSpeed = -0.3; // Control the speed of the auto-rotation
 
         // Set the center of the orbit (usually the center of the scene)
@@ -61,7 +61,7 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         //this.scene.add(axisHelper);
 
-        this.ambientLight = new THREE.AmbientLight(0x00ffff, 1.0);
+        this.ambientLight = new THREE.AmbientLight(0x00ffff, .5);
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
@@ -79,6 +79,22 @@ class Main {
 
         //const testCard = new Card('3', 'diamonds', 0);
         //this.scene.add(testCard);
+
+        // Create a spotlight with white color and set its intensity
+        const spotlight = new THREE.SpotLight(0xffffff, 100); // Adjust intensity as needed
+        spotlight.position.set(0, 300, 0); // Position the spotlight above and to the side of the model
+        spotlight.angle = Math.PI / 4; // Spotlight spread angle
+        spotlight.penumbra = 0.5; // Soft edges
+        spotlight.decay = 1; // Decay rate, for realistic falloff
+        spotlight.distance = 400; // Maximum range of the light
+
+        // Enable shadow casting
+        spotlight.castShadow = true;
+        spotlight.shadow.mapSize.width = 2048; // Shadow resolution
+        spotlight.shadow.mapSize.height = 2048;
+
+        // Add the spotlight to the scene
+        this.scene.add(spotlight);
 
         const video = document.createElement("video");
         video.src = "public/assets/textures/table/tableScreen.mp4";
@@ -226,14 +242,6 @@ class Main {
     loadTableEdge() {
         // Create a loader for the GLTF/GLB model
         const loader = new GLTFLoader();
-        const textureLoader = new THREE.TextureLoader();
-
-        // Load the noise texture
-        const noiseTexture = textureLoader.load(
-            "public/assets/textures/table/noise.jpg"
-        );
-        noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping;
-        noiseTexture.repeat.set(4, 4); // Adjust tiling as needed for desired noise scale
 
         // Path to the GLB model
         const modelPath = "public/assets/models/TableEdge.glb";
@@ -247,49 +255,6 @@ class Main {
                 model.scale.set(19, 19, 19);
 
                 model.position.set(0, 0, 0);
-
-                // Traverse through each child in the model to apply metallic properties with noise
-                model.traverse((child) => {
-                    if (child.isMesh) {
-                        const originalMaterial = child.material;
-
-                        // Only modify material if it exists and is a standard or physical material
-                        if (
-                            originalMaterial &&
-                            (originalMaterial.isMeshStandardMaterial ||
-                                originalMaterial.isMeshPhysicalMaterial)
-                        ) {
-                            child.material = new THREE.MeshStandardMaterial({
-                                // Preserve original texture and emissive settings
-                                map: originalMaterial.map || null,
-                                emissive:
-                                    originalMaterial.emissive ||
-                                    new THREE.Color(0x000000),
-                                emissiveMap:
-                                    originalMaterial.emissiveMap || null,
-                                emissiveIntensity:
-                                    originalMaterial.emissiveIntensity || 1.0,
-
-                                // Apply metallic properties for a metallic appearance
-                                color:
-                                    originalMaterial.color ||
-                                    new THREE.Color(0x333333), // Base color
-                                metalness: 0.8,
-                                roughness: 0.3,
-                                envMapIntensity: 1.0,
-
-                                // Add noise texture for a more natural metal effect
-                                roughnessMap: noiseTexture,
-                                aoMap: noiseTexture,
-                            });
-
-                            // Enable shadows if needed
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                    }
-                });
-
                 // Add the loaded model to the scene
                 this.scene.add(model);
             },
@@ -375,12 +340,12 @@ class Main {
                 break;
             case "a":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x -= 0.5;
+                    this.pointLight.position.x += 0.5;
                 }
                 break;
             case "d":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x += 0.5;
+                    this.pointLight.position.x -= 0.5;
                 }
                 break;
             case "l":
