@@ -37,7 +37,7 @@ class Main {
             0.1,
             3000
         );
-        this.camera.position.set(0, 20, 30);
+        this.camera.position.set(0, 17, 30);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
@@ -115,6 +115,7 @@ class Main {
 
         this.loadTableEdge();
         this.loadDrone();
+        this.createWarPlane();
 
         // Temporary Cards
         const geometry = new THREE.BoxGeometry(2.5, 0.02, 3.5);
@@ -298,6 +299,28 @@ class Main {
         );
     }
 
+    createWarPlane() {
+        // Create the plane geometry (same width and length as the table)
+        const planeGeometry = new THREE.CylinderGeometry(18, 18, 0.1); // Adjust size to match the table
+
+        // Create a transparent red material
+        const redMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,  // Red color
+            opacity: 0.6,     // Transparent
+            emissive: 0xffffff,
+            transparent: true,  // Enable transparency
+            depthWrite: false   // Ensure transparency is handled correctly
+        });
+
+        // Create the plane mesh and position it above the table
+        this.warPlane = new THREE.Mesh(planeGeometry, redMaterial);
+        this.warPlane.position.set(0, -0.04, 0);  // Position it above the table (adjust the y value to match the table height)
+        this.warPlane.visible = false;  // Start with the plane hidden
+
+        // Add the plane to the scene
+        this.scene.add(this.warPlane);
+    }
+
     // Our animate function
     animate(time) {
         this.stats.begin();
@@ -348,6 +371,12 @@ class Main {
                         ? 0xfe4649
                         : 0x73d2d9; // Red if war is true, teal blue if false
         this.ambientLight.color.set(color);
+
+        if (this.game.war) {
+            this.warPlane.visible = true;
+        } else {
+            this.warPlane.visible = false;
+        }
 
         this.scene.traverse((object) => {
             if (object.isMesh && object.material) {
