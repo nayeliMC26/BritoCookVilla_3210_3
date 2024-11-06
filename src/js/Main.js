@@ -61,7 +61,7 @@ class Main {
         const axisHelper = new THREE.AxesHelper(5);
         //this.scene.add(axisHelper);
 
-        this.ambientLight = new THREE.AmbientLight(0x00ffff, .5);
+        this.ambientLight = new THREE.AmbientLight(0x00ffff, 0.5);
         this.scene.add(this.ambientLight);
 
         // Temporary pointLight
@@ -81,7 +81,7 @@ class Main {
         //this.scene.add(testCard);
 
         // Create a spotlight with white color and set its intensity
-        const spotlight = new THREE.SpotLight(0xffffff, 100); // Adjust intensity as needed
+        const spotlight = new THREE.SpotLight(0xffffff, 500); // Adjust intensity as needed
         spotlight.position.set(0, 300, 0); // Position the spotlight above and to the side of the model
         spotlight.angle = Math.PI / 4; // Spotlight spread angle
         spotlight.penumbra = 0.5; // Soft edges
@@ -99,9 +99,9 @@ class Main {
         const video = document.createElement("video");
         video.src = "public/assets/textures/table/tableScreen.mp4";
         video.load();
-        video.play();
         video.loop = true;
         video.muted = true;
+        video.play();
 
         const videoTexture = new THREE.VideoTexture(video);
 
@@ -227,7 +227,7 @@ class Main {
         // Create the UnrealBloomPass for bloom effect
         this.bloomPass = new UnrealBloomPass(
             new THREE.Vector2(window.innerWidth, window.innerHeight), // Resolution
-            0.3, // Bloom strength
+            0.4, // Bloom strength
             0.4, // Bloom radius
             1.0 // Bloom threshold
         );
@@ -255,6 +255,26 @@ class Main {
                 model.scale.set(19, 19, 19);
 
                 model.position.set(0, 0, 0);
+
+                // Traverse the model and identify materials that are emissive
+                model.traverse((object) => {
+                    if (object.isMesh && object.material) {
+                        const material = object.material;
+
+                        // Check if the material has an emissive property that is not black
+                        if (
+                            material.emissive &&
+                            !material.emissive.equals(new THREE.Color(0, 0, 0))
+                        ) {
+                            // Only modify emissive color if it is not black
+                            material.emissive.set(0x73d2d9); // Set to blue
+                        } else {
+                            // If material is not emissive, ensure it doesn't have an emissive color
+                            material.emissive.set(0x000000); // Ensuring non-emissive materials have black emissive value
+                        }
+                    }
+                });
+
                 // Add the loaded model to the scene
                 this.scene.add(model);
             },
@@ -306,9 +326,34 @@ class Main {
             this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
         }
 
+        this.updateEmissions();  // Always call this during war
+        //this.updateEmissions();
+
         this.composer.render();
         // this.renderer.render(this.scene, this.camera);
         this.stats.end();
+    }
+
+    updateEmissions() {
+        const color = this.game.getWarStatus()
+                        ? 0xfe4649
+                        : 0x73d2d9; // Red if war is true, teal blue if false
+        this.ambientLight.color.set(color);
+
+        this.scene.traverse((object) => {
+            if (object.isMesh && object.material) {
+                // If object material is emissive, change its color based on war state
+                if (object.material.emissive && object.material.emissive.getHex() != 0x000000) {
+                    const color = this.game.getWarStatus()
+                        ? 0xfeabad
+                        : 0x73d2d9; // Red if war is true, teal blue if false
+                    object.material.emissive.set(color);
+                    if (this.game.getWarStatus()) {
+                        console.log("HEY I WORK!")
+                    }
+                }
+            }
+        });
     }
 
     // A function to update the projection matrix when the window is resized
