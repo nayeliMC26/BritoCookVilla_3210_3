@@ -402,12 +402,12 @@ class Main {
                 break;
             case "s":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z += 0.5;
+                    this.pointLight.position.z -= 0.5;
                 }
                 break;
             case "w":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z -= 0.5;
+                    this.pointLight.position.z += 0.5;
                 }
                 break;
         }
