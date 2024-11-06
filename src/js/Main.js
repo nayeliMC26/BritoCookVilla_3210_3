@@ -35,7 +35,7 @@ class Main {
             0.1,
             3000
         );
-        this.camera.position.set(0, 30, 50);
+        this.camera.position.set(0, 40, 60);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
@@ -43,6 +43,16 @@ class Main {
             this.camera,
             this.renderer.domElement
         );
+
+        // Enable auto-rotation on the controls
+        this.controls.enableDamping = true;  // Smooth transition when rotating
+        this.controls.dampingFactor = 0.25;  // Adjust damping for a smoother effect
+        this.controls.enableZoom = true;  // Enable zoom if needed
+        this.controls.autoRotate = true;  // Enable auto-rotation
+        this.controls.autoRotateSpeed = -0.3; // Control the speed of the auto-rotation
+
+        // Set the center of the orbit (usually the center of the scene)
+        this.controls.target.set(0, 0, 0); // Look at the center
 
         const gridHelper = new THREE.GridHelper(50, 50);
         //this.scene.add(gridHelper);
