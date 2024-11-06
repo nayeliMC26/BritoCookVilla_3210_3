@@ -5,6 +5,13 @@ import { Animations } from "./Animations.js";
 import Game from "./Game.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+// For bloom effect
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { CopyShader } from "three/examples/jsm/shaders/CopyShader.js";
+
 class Main {
     constructor() {
         this.stats = new Stats();
@@ -48,18 +55,13 @@ class Main {
 
         // Temporary pointLight
         this.pointLight = new THREE.PointLight(0xffffff, 100, 0);
-        this.pointLight.position.set(0, 20, 20);
+        this.pointLight.position.set(0, 10, 0);
         this.pointLight.castShadow = true;
 
         this.pointLight.shadow.mapSize.width = 2048;
         this.pointLight.shadow.mapSize.height = 2048;
 
         this.scene.add(this.pointLight);
-
-        // Initialize rotation target and flags
-        this.rotateY = 0; // Track the target Y rotation
-        this.pointLightMoving = false; // Track if point light can move
-        this.pointLightRotationTarget = null; // Track target rotation angle
 
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight);
         //this.scene.add(this.pointLightHelper, 1.0)
@@ -187,6 +189,27 @@ class Main {
         this.t5 = false;
         this.t6 = false;
 */
+
+        // Create the EffectComposer
+        this.composer = new EffectComposer(this.renderer);
+
+        // Create the RenderPass
+        const renderPass = new RenderPass(this.scene, this.camera);
+        this.composer.addPass(renderPass);
+
+        // Create the UnrealBloomPass for bloom effect
+        this.bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight), // Resolution
+            0.3, // Bloom strength
+            0.4, // Bloom radius
+            1.0 // Bloom threshold
+        );
+        this.composer.addPass(this.bloomPass);
+
+        // Optional: Create a ShaderPass to copy the result to the screen
+        const copyPass = new ShaderPass(CopyShader);
+        copyPass.renderToScreen = true;
+        this.composer.addPass(copyPass);
     }
 
     loadTableEdge() {
@@ -210,7 +233,7 @@ class Main {
             (gltf) => {
                 const model = gltf.scene;
 
-                model.scale.set(19, 19, 19); 
+                model.scale.set(19, 19, 19);
 
                 model.position.set(0, 0, 0);
 
@@ -240,13 +263,13 @@ class Main {
                                 color:
                                     originalMaterial.color ||
                                     new THREE.Color(0x333333), // Base color
-                                metalness: 0.8, 
+                                metalness: 0.8,
                                 roughness: 0.3,
                                 envMapIntensity: 1.0,
 
                                 // Add noise texture for a more natural metal effect
-                                roughnessMap: noiseTexture, 
-                                aoMap: noiseTexture, 
+                                roughnessMap: noiseTexture,
+                                aoMap: noiseTexture,
                             });
 
                             // Enable shadows if needed
@@ -279,7 +302,7 @@ class Main {
             (gltf) => {
                 const model = gltf.scene;
 
-                model.scale.set(1, 1, 1); 
+                model.scale.set(1, 1, 1);
 
                 model.position.set(0, 0, 0);
 
@@ -307,7 +330,8 @@ class Main {
             this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
         }
 
-        this.renderer.render(this.scene, this.camera);
+        this.composer.render();
+        // this.renderer.render(this.scene, this.camera);
         this.stats.end();
     }
 
@@ -320,41 +344,41 @@ class Main {
 
     keydown(event) {
         switch (event.key.toLowerCase()) {
-            case '1':
+            case "1":
                 this.t1 = true;
                 break;
-            case '2':
+            case "2":
                 this.t2 = true;
                 break;
-            case '3':
+            case "3":
                 this.t3 = true;
                 break;
-            case '4':
+            case "4":
                 this.t4 = true;
                 break;
-            case '5':
+            case "5":
                 this.t5 = true;
                 break;
-            case '6':
+            case "6":
                 this.t6 = true;
                 break;
-            case 'a':
+            case "a":
                 if (this.pointLight.visible) {
                     this.pointLight.position.x -= 0.5;
                 }
                 break;
-            case 'd':
+            case "d":
                 if (this.pointLight.visible) {
                     this.pointLight.position.x += 0.5;
                 }
                 break;
-            case 'l':
+            case "l":
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
-            case 'm':
+            case "m":
                 this.pointLight.castShadow = !this.pointLight.castShadow;
                 break;
-            case 'n':
+            case "n":
                 if (this.game.gameActive) {
                     this.game.playRound();
                     this.game.compareCard();
@@ -363,15 +387,15 @@ class Main {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
-            case 'p':
+            case "p":
                 this.pointLight.visible = !this.pointLight.visible;
                 break;
-            case 's':
+            case "s":
                 if (this.pointLight.visible) {
                     this.pointLight.position.z += 0.5;
                 }
                 break;
-            case 'w':
+            case "w":
                 if (this.pointLight.visible) {
                     this.pointLight.position.z -= 0.5;
                 }
