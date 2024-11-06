@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { Animations } from "./Animations.js";
 import Game from "./Game.js";
@@ -14,6 +13,8 @@ import { CopyShader } from "three/examples/jsm/shaders/CopyShader.js";
 
 class Main {
     constructor() {
+        this.warPopup = document.getElementById("warPopup");
+        this.prevWar = 0;
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
         // Initializing the scene, renderer, and camera
@@ -39,21 +40,6 @@ class Main {
         this.camera.position.set(0, 20, 30);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
-
-        this.controls = new OrbitControls(
-            this.camera,
-            this.renderer.domElement
-        );
-
-        // Enable auto-rotation on the controls
-        this.controls.enableDamping = true; // Smooth transition when rotating
-        this.controls.dampingFactor = 0.25; // Adjust damping for a smoother effect
-        this.controls.enableZoom = true; // Enable zoom if needed
-        this.controls.autoRotate = true; // Enable auto-rotation
-        this.controls.autoRotateSpeed = -0.3; // Control the speed of the auto-rotation
-
-        // Set the center of the orbit (usually the center of the scene)
-        this.controls.target.set(0, 0, 0); // Look at the center
 
         const gridHelper = new THREE.GridHelper(50, 50);
         //this.scene.add(gridHelper);
@@ -315,7 +301,6 @@ class Main {
     // Our animate function
     animate(time) {
         this.stats.begin();
-        this.controls.update();
         if (this.t1) {
             this.t1 = this.Animations.flipCard("ONE", this.card6, time);
         }
@@ -325,6 +310,12 @@ class Main {
         if (this.t3) {
             this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
         }
+        var curWar = this.game.warCount;
+
+        if (this.game.getWarStatus() && this.prevWar != curWar) {
+            this.prevWar = this.game.warCount;
+            this.showWarPopUp();
+        }
 
         this.updateEmissions();  // Always call this during war
         //this.updateEmissions();
@@ -332,6 +323,24 @@ class Main {
         this.composer.render();
         // this.renderer.render(this.scene, this.camera);
         this.stats.end();
+    }
+
+    showWarPopUp() {
+        // Set the popup text
+        console.log("Popup function called");
+        this.warPopup.innerText = `WW${this.game.warCount}`;
+        // Make the popup visible and start fade-in
+        this.warPopup.style.display = "block";
+        this.warPopup.style.opacity = "1";
+
+        // After 1.5 seconds, fade out the popup
+        setTimeout(() => {
+            this.warPopup.style.opacity = "0";
+            // After fade-out animation, hide it completely
+            setTimeout(() => {
+                this.warPopup.style.display = "none";
+            }, 500); // Match this to the CSS transition duration
+        }, 1500); // Display time
     }
 
     updateEmissions() {
@@ -348,9 +357,6 @@ class Main {
                         ? 0xfeabad
                         : 0x73d2d9; // Red if war is true, teal blue if false
                     object.material.emissive.set(color);
-                    if (this.game.getWarStatus()) {
-                        console.log("HEY I WORK!")
-                    }
                 }
             }
         });

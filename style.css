@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
 html,
 body {
     margin: 0;
@@ -6,4 +8,23 @@ body {
     width: 100%;
     overflow: hidden;
     position: relative;
+}
+
+#warPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(10, 10, 10, 0.9); /* Darker with slight transparency */
+    color: #00ffea; /* Neon cyan */
+    padding: 25px 50px;
+    font-size: 32px; /* Larger font size */
+    font-family: 'Orbitron', sans-serif; /* Futuristic font */
+    text-align: center;
+    border-radius: 12px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 234, 0.7); /* Neon glow effect */
+    border: 2px solid #00ffea; /* Border to match neon glow */
 }
