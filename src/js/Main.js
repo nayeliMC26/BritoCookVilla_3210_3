@@ -90,7 +90,7 @@ class Main {
         this.spotlight.penumbra = 0.5; // Soft edges
         this.spotlight.decay = 1; // Decay rate, for realistic falloff
         this.spotlight.distance = 400; // Maximum range of the light
-        this.spotlight.shadow.bias = -0.0005; // Prevents weird lines from appearing
+        this.spotlight.shadow.bias = -0.00005; // Prevents weird lines from appearing
 
         // Enable shadow casting
         this.spotlight.castShadow = true;
