@@ -177,12 +177,12 @@ class Main {
         this.card6.position.set(-14, 0.275, 0);
         // this.card3.position.set(-4, 0.01, 0);
         this.card6.rotateY(Math.PI / 2);
-        this.scene.add(this.card);
-        this.scene.add(this.card2);
-        this.scene.add(this.card3);
-        this.scene.add(this.card4);
-        this.scene.add(this.card5);
-        this.scene.add(this.card6);
+        // this.scene.add(this.card);
+        // this.scene.add(this.card2);
+        // this.scene.add(this.card3);
+        // this.scene.add(this.card4);
+        // this.scene.add(this.card5);
+        // this.scene.add(this.card6);
 
         // Line to test paths
         this.testPath = new THREE.CatmullRomCurve3([
@@ -200,25 +200,17 @@ class Main {
         // Object to call different animations
         this.Animations = new Animations(this.scene);
 
+        this.cards = [];
+        this.animationState = 'idle';
+        this.winningPlayer = 0;
+        this.cardsWon = 0;
+
         this.game = new Game(this.scene);
         console.log("Game initialized:", this.game, "\n\n");
 
-        window.addEventListener("resize", () => this.onWindowResize(), false);
-        window.addEventListener(
-            "keydown",
-            (event) => this.keydown(event),
-            false
-        );
+        window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keydown(event), false);
         this.test = true;
-
-        /*var testDeck = new Deck(this.scene);
-        this.t1 = false;
-        this.t2 = false;
-        this.t3 = false;
-        this.t4 = false;
-        this.t5 = false;
-        this.t6 = false;
-*/
     }
 
     loadTableEdge() {
@@ -342,24 +334,47 @@ class Main {
     // Our animate function
     animate(time) {
         this.stats.begin();
-        if (this.t1) {
-            this.t1 = this.Animations.flipCard("ONE", this.card6, time);
+        this.controls.update();
+        switch (this.animationState) {
+            case 'draw':
+                var i = this.Animations.flipCard("ONE", this.game.comparisonPool[0], this.game.warCards, time);
+                var ii = this.Animations.flipCard("TWO", this.game.comparisonPool[1], this.game.warCards, time);
+                var iii = this.Animations.flipCard("THREE", this.game.comparisonPool[2], this.game.warCards, time);
+                // console.log((i || ii || iii));
+                if (!(i || ii || iii)) {
+                    this.winningPlayer = this.game.winningPlayerId;
+                    this.cardsWon = this.game.winningPool.length
+                    console.log("update");
+                }
+                this.animationState = (i || ii || iii) ? 'draw' : 'lift';
+                // this.animationState = (i || ii || iii) ? 'draw' : 'idle';
+                break;
+            case 'lift':
+                var id = this.winningPlayer;
+                console.log(id - 1);
+                var deck = this.game.playerDecks[id - 1].cards.slice(0, this.cardsWon * -1);
+                // console.log(`DECK ${id}: `, deck);
+                var i = this.Animations.liftDeck(id, deck, this.game.winningPool.length, time);
+                // console.log(i);
+                this.animationState = (i) ? 'lift' : 'drawBack';
+                break;
+            case 'drawBack':
+                var id = this.winningPlayer;
+                var i = this.Animations.drawBack(id, this.game.winningPool.toReversed(), time);
+                // console.log(i);
+                this.animationState = (i) ? 'drawBack' : 'idle';
+                break;
         }
-        if (this.t2) {
-            this.t2 = this.Animations.war("ONE", this.card5, this.card4, time);
-        }
-        if (this.t3) {
-            this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
-        }
+      
         var curWar = this.game.warCount;
 
         if (this.game.getWarStatus() && this.prevWar != curWar) {
             this.prevWar = this.game.warCount;
             this.showWarPopUp();
         }
-
+      
+        // this.renderer.render(this.scene, this.camera);
         this.updateEmissions();
-
         this.composer.render();
         this.stats.end();
     }
@@ -417,24 +432,6 @@ class Main {
 
     keydown(event) {
         switch (event.key.toLowerCase()) {
-            case "1":
-                this.t1 = true;
-                break;
-            case "2":
-                this.t2 = true;
-                break;
-            case "3":
-                this.t3 = true;
-                break;
-            case "4":
-                this.t4 = true;
-                break;
-            case "5":
-                this.t5 = true;
-                break;
-            case "6":
-                this.t6 = true;
-                break;
             case "a":
                 if (this.pointLight.visible) {
                     this.pointLight.position.x -= 0.5;
@@ -453,11 +450,12 @@ class Main {
                 this.spotlight.castShadow = !this.spotlight.castShadow;
                 break;
             case "n":
-                if (this.game.gameActive) {
+                if (this.game.gameActive && (this.animationState == 'idle') && (this.test)) {
                     this.game.playRound();
-                    this.game.compareCard();
-                    console.log("Game state:", this.game, "\n\n");
-                } else {
+                    this.cards = this.game.comparisonPool;
+                    // this.game.compareCard();
+                    this.animationState = 'draw';
+                } else if (this.animationState == 'idle') {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
