@@ -12,6 +12,8 @@ class Game {
         // Counters
         this.roundCount = 0;
         this.warCount = 0;
+
+        this.removedPlayerId = 0;
         // Flag for userInput toggle
         this.gameActive = true;
         // Initializing the game
@@ -37,11 +39,11 @@ class Game {
         // Create a list of vectors for player positions
         var playerPositions = [
             // Player 1 position
-            new THREE.Vector3(-14, 0.175, 0),
+            new THREE.Vector3(-14, 0.165, 0),
             // Player 2 position 
-            new THREE.Vector3(14, 0.175, 0),
+            new THREE.Vector3(14, 0.165, 0),
             // Player 3 position
-            new THREE.Vector3(0, 0.175, -14)
+            new THREE.Vector3(0, 0.165, -14)
         ];
         // For each player, set the playerDeck's position
         this.playerDecks.forEach((deck, index) => {
@@ -113,6 +115,7 @@ class Game {
             } else {
                 // If the player is out of cards, remove them and decrement the array of playerDecks
                 console.log(`Player ${playerDeck.playerId} removed`)
+                this.removedPlayerId = playerDeck.playerId;
                 this.playerDecks.splice(i, 1);
                 i--;
                 if (this.checkGameState()) return;
@@ -247,6 +250,12 @@ class Game {
      * @param {*} playerId 
      */
     removePlayer(playerId) {
+        this.removedPlayerId = playerId;
+        console.log("")
+        console.log("")
+        console.log(playerId)
+        console.log("")
+        console.log("")
         // Iterate backwards through the array of plauyers
         for (var i = this.playerDecks.length - 1; i >= 0; i--) {
             // If the current player is the one that needs to be removed

@@ -27,7 +27,7 @@ export class Animations {
                 new THREE.Vector3(-14, 0.005, 0),
             ]),
             path: "",
-            pr: Math.PI / 2,
+            rotation: Math.PI / 2,
             s1: 0.005,
             s2: 0.005,
             s3: 0.005,
@@ -56,7 +56,7 @@ export class Animations {
                 new THREE.Vector3(14, 0.005, 0),
             ]),
             path: "",
-            pr: Math.PI / 2,
+            rotation: Math.PI / 2,
             s1: 0.005,
             s2: 0.005,
             s3: 0.005,
@@ -84,7 +84,7 @@ export class Animations {
                 new THREE.Vector3(0, 0.005, -14),
             ]),
             path: "",
-            pr: Math.PI,
+            rotation: Math.PI,
             s1: 0.005,
             s2: 0.005,
             s3: 0.005,
@@ -99,25 +99,18 @@ export class Animations {
     flipCard(player, object, war, time) {
         // Which player are we moving the card for
         player = this.#getPlayer(player);
-        // console.log(object);
         if ((player === undefined) || object === undefined) {
             return false;
         }
         // if this is the first call of the funtion
         if (player.index === -1) {
-            console.log("flip index")
             player.time = time;
             // Set the start of the path to the objects location
             player.flipPath.points[0] = (object.position.clone());
-            // Line use for debugging 
-            const geo = new THREE.BufferGeometry().setFromPoints(player.flipPath.getPoints(50));
-            const mat = new THREE.LineBasicMaterial({ color: 0xffffff * Math.random() });
-            const line = new THREE.Line(geo, mat);
-            this.scene.add(line);
         }
         // Index used to track where were moving the object to (the percentage of the path)
-        // const currIndex = ((time - player.time) / 300 % 4) / 4;
-        const currIndex = ((time - player.time) % 4) / 4;
+        const currIndex = ((time - player.time) / 300 % 4) / 4;
+        // const currIndex = ((time - player.time) * 2 % 4) / 4;
         // If the animation has not started to loop
         if ((currIndex > player.index) && !object.flipped) {
             // Get the vertex at the current index
@@ -134,8 +127,7 @@ export class Animations {
             player.index = currIndex;
             // Return treu to keep the animation going
             return true
-        }
-        if (!object.flipped) {
+        } else if (!object.flipped) {
             object.flipped = true;
             // Else when the aimation start to loop 
             // Move object to the end of the line
@@ -147,7 +139,6 @@ export class Animations {
             object.rotation.z = Math.PI;
             // Reseting the player index
             player.index = -2;
-
         }
         // Retunr false to stop animation
         return this.war(player.number, war, time);
@@ -165,21 +156,14 @@ export class Animations {
         }
 
         const currCard = cards[player.count];
-        // console.log(cards);
 
         // if this is the first call of the funtion
         if (player.index === -2) {
-            console.log(`${player.number}: count -> ${player.count}`)
             player.time = time;
             player.inWar = true;
             // Set the start of the path to the objects location
             player.drawPath.points[0] = currCard.position.clone();
             player.path = player.drawPath;
-            // Line use for debugging 
-            const geo = new THREE.BufferGeometry().setFromPoints(player.drawPath.getPoints(50));
-            const mat = new THREE.LineBasicMaterial({ color: 0xffffff * Math.random() });
-            const line = new THREE.Line(geo, mat);
-            this.scene.add(line);
         } else if (player.index === -3) {
             player.time = time;
             currCard.flipped = true;
@@ -188,15 +172,10 @@ export class Animations {
             // Set the start of the path to the objects location
             player.flipPath.points[0] = currCard.position.clone();
             player.path = player.flipPath;
-            // Line use for debugging 
-            const geo = new THREE.BufferGeometry().setFromPoints(player.flipPath.getPoints(50));
-            const mat = new THREE.LineBasicMaterial({ color: 0xffffff * Math.random() });
-            const line = new THREE.Line(geo, mat);
-            this.scene.add(line);
         }
         // Index used to track where were moving the object to (the percentage of the path)
-        // const currIndex = ((time - player.time) / 300 % 4) / 4;
-        const currIndex = ((time - player.time) % 4) / 4;
+        const currIndex = ((time - player.time) / 300 % 4) / 4;
+        // const currIndex = ((time - player.time) * 2 % 4) / 4;
         // If the animation has not started to loop
         if ((currIndex > player.index) && (player.count < cards.length)) {
             const position = player.path.getPointAt(currIndex);
@@ -218,12 +197,11 @@ export class Animations {
             // currCard.rotation.z = Math.PI;
             currCard.rotation.z = player.inWar ? 0 : Math.PI;
 
-            // currCard.rotation.y = player.pr;
+            // currCard.rotation.y = player.rotation;
             player.index = player.inWar ? -3 : -2;
             player.time = time;
             // player.s1 += 0.01;
             player.count += 3
-            // console.log("count increase");
             return true;
         }
 
@@ -254,8 +232,8 @@ export class Animations {
             player.time = time;
         }
 
-        // const currIndex = ((time - player.time) / 225 % 3) / 3;
-        const currIndex = ((time - player.time) % 3) / 3;
+        const currIndex = ((time - player.time) / 225 % 3) / 3;
+        // const currIndex = ((time - player.time) * 2 % 3) / 3;
         // If the animation has not started to loop
         if (currIndex > player.index) {
             if (player.index === -1) player.index = 0;
@@ -266,7 +244,6 @@ export class Animations {
 
                 object.translateY((0.01 * height * currIndex) - (0.01 * height * player.index));
             });
-            // console.log((0.01 * height * currIndex) - (0.01 * height * player.index));
             // Move the object to the current index position
             // Updating the player index to the current index
             player.index = currIndex;
@@ -274,12 +251,7 @@ export class Animations {
             return true;
         }
         objects.forEach((object) => {
-            // object.position.y = 0;
-            // object.trabs = + position.y
             object.translateY((0.01 * height) - (0.01 * height * player.index));
-            // object.translateY(-(0.01 * height * player.index));
-            // object.translateY((0.01 * height));
-
         });
         player.index = -1;
         return false;
@@ -295,7 +267,6 @@ export class Animations {
 
 
         if (player.index === -1) {
-            console.log("drawBack");
             player.time = time;
             // this.winningDeck = new THREE.Group().add(...objects);
             // this.scene.add(this.winningDeck);
@@ -303,22 +274,13 @@ export class Animations {
             player.drawBackPath.points[1] = currCard.position.clone();
             player.drawBackPath.points[1].y = currCard.flipped ? 3 : 0;
             this.currRotation = currCard.rotation.y;
-            // console.log(objects);
-            // console.log()
+
             // Set the start of the path to the objects location
             // player.liftPath.points[0] = (this.winningDeck.position.clone());
-            // // Line use for debugging 
-            const geo = new THREE.BufferGeometry().setFromPoints(player.drawBackPath.getPoints(50));
-            const mat = new THREE.LineBasicMaterial({ color: 0xffffff * Math.random() });
-            const line = new THREE.Line(geo, mat);
-            this.scene.add(line);
         }
 
-        // const currIndex = ((time - player.time) / 375 % 5) / 5;
-        const currIndex = ((time - player.time) % 5) / 5;
-
-        // console.log((this.deckCount < objects.length), " ", this.deckCount)
-        // console.log(objects.length, " ", this.deckCount)
+        const currIndex = ((time - player.time) / 375 % 5) / 5;
+        // const currIndex = ((time - player.time) % 5) / 5;
         if ((currIndex > player.index) && (this.deckCount < objects.length)) {
             // Get the vertex at the current index
             const position = player.drawBackPath.getPointAt(currIndex);
@@ -327,17 +289,15 @@ export class Animations {
 
             if ((currIndex >= 0.25) && (currIndex <= 0.50) && (currCard.flipped)) {
                 // Rotate the object (flipping)
-                // console.log(this.winningDeck.children[player.count]);
                 currCard.rotation.z = Math.PI - (Math.PI * ((currIndex - 0.25) / 0.25));
                 // currCard.rotateZ((Math.PI * ((currIndex - 0.25) / 0.25)) - (Math.PI * ((player.index - 0.25) / 0.25)));
             } else if ((currIndex >= 0.50) && (currCard.flipped)) {
                 currCard.rotation.z = 0;
             }
 
-            if ((currIndex >= 0.50) && (currIndex <= 0.75) && ((this.currRotation % Math.PI) != player.pr)) {
+            if ((currIndex >= 0.50) && (currIndex <= 0.75) && ((this.currRotation % Math.PI) != player.rotation)) {
                 // Rotate the object (flipping)
-                // console.log(this.winningDeck.children[player.count]);
-                currCard.rotation.y = this.currRotation + ((player.pr - this.currRotation) * ((currIndex - 0.50) / 0.25));
+                currCard.rotation.y = this.currRotation + ((player.rotation - this.currRotation) * ((currIndex - 0.50) / 0.25));
 
             }
             // Updating the player index to the current index
@@ -345,13 +305,11 @@ export class Animations {
             // Return treu to keep the animation going
             return true
         } else if (this.deckCount < objects.length - 1) {
-            // console.log(player.count);
-            // console.log(this.winningDeck.children.length);
             currCard.flipped = false;
             currCard.position.copy(player.drawBackPath.getPointAt(1));
             currCard.rotation.z = 0;
             currCard.position.y = player.s1;
-            currCard.rotation.y = player.pr;
+            currCard.rotation.y = player.rotation;
             player.index = -2;
             player.time = time;
             player.s1 += 0.01;
@@ -361,16 +319,18 @@ export class Animations {
             player.drawBackPath.points[1] = objects[this.deckCount].position.clone();
             player.drawBackPath.points[1].y = objects[this.deckCount].flipped ? 3 : 0;
             player.drawBackPath.points[3].y = player.s1;
-            // console.log("count increase");
             return true;
         }
+        currCard.rotation.z = 0;
         currCard.flipped = false;
         currCard.position.y = player.s1;
-        currCard.rotation.y = player.pr;
+        currCard.rotation.y = player.rotation;
         objects[this.deckCount].position.copy(player.drawBackPath.getPointAt(1));
         player.index = -1;
         this.deckCount = 0;
         player.s1 = 0.005;
+        player.s2 = 0.005;
+        player.s3 = 0.005;
 
         return false;
 
