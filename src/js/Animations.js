@@ -27,14 +27,13 @@ export class Animations {
                 new THREE.Vector3(-14, 0.005, 0),
             ]),
             path: "",
-            rotation: Math.PI / 2,
-            s1: 0.005,
-            s2: 0.005,
-            s3: 0.005,
-            count: 0,
             time: 0,
-            // Used to track when the animation stars to loop
-            index: -1
+            index: -1,
+            rotation: Math.PI / 2,
+            spawnP1: 0.005,
+            spawnP2: 0.005,
+            spawnP3: 0.005,
+            count: 0
         };
         // Informataion to animate player two
         this.playerTwo = {
@@ -56,13 +55,13 @@ export class Animations {
                 new THREE.Vector3(14, 0.005, 0),
             ]),
             path: "",
-            rotation: Math.PI / 2,
-            s1: 0.005,
-            s2: 0.005,
-            s3: 0.005,
-            count: 1,
             time: 0,
-            index: -1
+            index: -1,
+            rotation: Math.PI / 2,
+            spawnP1: 0.005,
+            spawnP2: 0.005,
+            spawnP3: 0.005,
+            count: 1
         };
         // Information to animate player three
         this.playerThree = {
@@ -84,20 +83,20 @@ export class Animations {
                 new THREE.Vector3(0, 0.005, -14),
             ]),
             path: "",
-            rotation: Math.PI,
-            s1: 0.005,
-            s2: 0.005,
-            s3: 0.005,
-            count: 2,
             time: 0,
-            index: -1
+            index: -1,
+            rotation: Math.PI,
+            spawnP1: 0.005,
+            spawnP2: 0.005,
+            spawnP3: 0.005,
+            count: 2,
         };
         this.deckCount = 0;
         this.currRotation = 0;
     }
-    // Will move the card and flip it 
+
     flipCard(player, object, war, time) {
-        // Which player are we moving the card for
+        // Getting player
         player = this.#getPlayer(player);
         if ((player === undefined) || object === undefined) {
             return false;
@@ -109,7 +108,7 @@ export class Animations {
             player.flipPath.points[0] = (object.position.clone());
         }
         // Index used to track where were moving the object to (the percentage of the path)
-        const currIndex = ((time - player.time) / 300 % 4) / 4;
+        const currIndex = ((time - player.time) / 200 % 4) / 4;
         // const currIndex = ((time - player.time) * 2 % 4) / 4;
         // If the animation has not started to loop
         if ((currIndex > player.index) && !object.flipped) {
@@ -133,8 +132,8 @@ export class Animations {
             // Move object to the end of the line
             object.position.copy(player.flipPath.getPointAt(1));
             // Move object to the correct height of the stack
-            object.position.y = player.s3;
-            player.s3 += 0.01;
+            object.position.y = player.spawnP3;
+            player.spawnP3 += 0.01;
             // Make sure the object is flipped correctly
             object.rotation.z = Math.PI;
             // Reseting the player index
@@ -145,195 +144,193 @@ export class Animations {
     }
 
     war(player, cards, time) {
+        // Getting player 
         player = this.#getPlayer(player);
         if (player === undefined) {
             return false;
         }
-
+        // Making sure we're in a war
         if ((cards.length === 0) || (cards.length < 2) || (player.count >= cards.length)) {
             player.index = -1;
             return false;
         }
-
+        // Card we're currently working with
         const currCard = cards[player.count];
 
-        // if this is the first call of the funtion
+        // if this is the first call of the funtion (draw card)
         if (player.index === -2) {
+            // Start time of animation
             player.time = time;
+            // Setting player to in war
             player.inWar = true;
             // Set the start of the path to the objects location
             player.drawPath.points[0] = currCard.position.clone();
+            // Used to track path we're working with
             player.path = player.drawPath;
         } else if (player.index === -3) {
+            // Start time of animation
             player.time = time;
+            // Setting card to flipped
             currCard.flipped = true;
-            // player.object = object2;
+            // Setting player to not in war
             player.inWar = false;
             // Set the start of the path to the objects location
             player.flipPath.points[0] = currCard.position.clone();
+            // Used to track path we're working with
             player.path = player.flipPath;
         }
         // Index used to track where were moving the object to (the percentage of the path)
-        const currIndex = ((time - player.time) / 300 % 4) / 4;
+        const currIndex = ((time - player.time) / 200 % 4) / 4;
         // const currIndex = ((time - player.time) * 2 % 4) / 4;
-        // If the animation has not started to loop
+        // If the animation has not started to loop and count can be found in the cards
         if ((currIndex > player.index) && (player.count < cards.length)) {
             const position = player.path.getPointAt(currIndex);
             // Move the object to the current index position
             currCard.position.copy(position);
-            // If were more than 25% into the line
+            // Rotate the object (flipping) ff were more than 25% into the line
             if ((currIndex >= 0.25) && !player.inWar) {
-                // Rotate the object (flipping)
-                // Math.PI * the percentage of the rest of the path
                 currCard.rotation.z = Math.PI * ((currIndex - 0.25) / 0.75);
             }
-            // Updating the player index to the current index
             player.index = currIndex;
-            // Return treu to keep the animation going
+            // Return true to keep the animation going
             return true
+            // If animation is looping but we still have cards to go through
         } else if (player.count <= cards.length - 4) {
+            // Making sure cards are placed properly
             currCard.position.copy(player.path.getPointAt(1));
-            // currCard.position.y = player.inWar ? player.s2 : player.s3;
-            // currCard.rotation.z = Math.PI;
             currCard.rotation.z = player.inWar ? 0 : Math.PI;
-
-            // currCard.rotation.y = player.rotation;
+            // Wether to draw or flip a card
             player.index = player.inWar ? -3 : -2;
-            player.time = time;
-            // player.s1 += 0.01;
+            // Going to the next card for the player
             player.count += 3
+            // Return true to keep the animation going
             return true;
         }
-
-        // Else when the aimation start to loop 
-        // Move object to the end of the lineF
+        // Making sure last card is placed properly
         currCard.position.copy(player.path.getPointAt(1));
-        // Move object to the correct height of the stack
-        currCard.position.y = player.s3;
-        // player.s2 = player.inWar ? player.s2 += 0.01 : player.s2;
-        player.s3 = player.s3 += 0.01;;
-
+        currCard.position.y = player.spawnP3;
         currCard.rotation.z = Math.PI;
-        // player.stack = player.inWar ? player.stack += 0.0079 : player.stack;
-        // Make sure the object is flipped correctly
-        // Reseting the player index
+        player.spawnP3 += 0.01;
+        // Reseting index
         player.index = -1;
-        // Return true if player is in war 
+        // Stopping animation
         return false
     }
 
-    liftDeck(player, objects, height, time) {
+    liftDeck(player, cards, height, time) {
         player = this.#getPlayer(player);
-        if ((player === undefined) || objects === undefined) {
+        if ((player === undefined) || cards === undefined) {
             return false;
         }
 
         if (player.index === -1) {
             player.time = time;
         }
-
-        const currIndex = ((time - player.time) / 225 % 3) / 3;
+        // Index used to track where were moving the object to (perctange of distance to desired height)
+        const currIndex = ((time - player.time) / 150 % 3) / 3;
         // const currIndex = ((time - player.time) * 2 % 3) / 3;
         // If the animation has not started to loop
         if (currIndex > player.index) {
             if (player.index === -1) player.index = 0;
-            // Get the vertex at the current index
-            objects.forEach((object) => {
-                // object.position.y = 0;
-                // object.trabs = + position.y
-
+            // Slowly moving the cards up
+            cards.forEach((object) => {
                 object.translateY((0.01 * height * currIndex) - (0.01 * height * player.index));
             });
-            // Move the object to the current index position
             // Updating the player index to the current index
             player.index = currIndex;
-            // Return treu to keep the animation going
+            // Return true to keep the animation going
             return true;
         }
-        objects.forEach((object) => {
+        // Making sure cards are at the correct height
+        cards.forEach((object) => {
             object.translateY((0.01 * height) - (0.01 * height * player.index));
         });
+        // Reseting player index
         player.index = -1;
+        // Stopping animation
         return false;
-
     }
 
-    drawBack(player, objects, time) {
+    drawBack(player, cards, time) {
+        // Getting player 
         player = this.#getPlayer(player);
-        if ((player === undefined) || objects === undefined) {
+        if ((player === undefined) || cards === undefined) {
             return false;
         }
-        const currCard = objects[this.deckCount];
+        // Card we're currently working with
+        const currCard = cards[this.deckCount];
 
-
+        // Start of card animation
         if (player.index === -1) {
+            // Setting start time of animation
             player.time = time;
-            // this.winningDeck = new THREE.Group().add(...objects);
-            // this.scene.add(this.winningDeck);
+            // Getting a new rotation start and path to follow
+            this.currRotation = currCard.rotation.y;
             player.drawBackPath.points[0] = currCard.position.clone();
             player.drawBackPath.points[1] = currCard.position.clone();
+            // Whether the path should adjust for flipping or not
             player.drawBackPath.points[1].y = currCard.flipped ? 3 : 0;
-            this.currRotation = currCard.rotation.y;
-
-            // Set the start of the path to the objects location
-            // player.liftPath.points[0] = (this.winningDeck.position.clone());
+            // Updating the end height of the path
+            player.drawBackPath.points[3].y = player.spawnP1;
         }
 
-        const currIndex = ((time - player.time) / 375 % 5) / 5;
+        // Index used to track where were moving the object to (the percentage of the path)
+        const currIndex = ((time - player.time) / 250 % 5) / 5;
         // const currIndex = ((time - player.time) % 5) / 5;
-        if ((currIndex > player.index) && (this.deckCount < objects.length)) {
+        // If the animation has not started to loop and deckCount can be found in the cards
+        if ((currIndex > player.index) && (this.deckCount < cards.length)) {
             // Get the vertex at the current index
             const position = player.drawBackPath.getPointAt(currIndex);
             // Move the object to the current index position
             currCard.position.copy(position);
 
+            // Flip card if neccessary between 25% to 50% of the path
             if ((currIndex >= 0.25) && (currIndex <= 0.50) && (currCard.flipped)) {
-                // Rotate the object (flipping)
                 currCard.rotation.z = Math.PI - (Math.PI * ((currIndex - 0.25) / 0.25));
-                // currCard.rotateZ((Math.PI * ((currIndex - 0.25) / 0.25)) - (Math.PI * ((player.index - 0.25) / 0.25)));
             } else if ((currIndex >= 0.50) && (currCard.flipped)) {
                 currCard.rotation.z = 0;
             }
 
+            // Rotate card if neccessary between 50% to 75% of the path
             if ((currIndex >= 0.50) && (currIndex <= 0.75) && ((this.currRotation % Math.PI) != player.rotation)) {
-                // Rotate the object (flipping)
                 currCard.rotation.y = this.currRotation + ((player.rotation - this.currRotation) * ((currIndex - 0.50) / 0.25));
-
             }
-            // Updating the player index to the current index
+            // Current index becomes players new index
             player.index = currIndex;
-            // Return treu to keep the animation going
+            // Return true to keep the animation going
             return true
-        } else if (this.deckCount < objects.length - 1) {
+            // If animation is looping but we still have carsd to go through
+        } else if (this.deckCount < cards.length - 1) {
             currCard.flipped = false;
+            // Making sure cards are placed properly
             currCard.position.copy(player.drawBackPath.getPointAt(1));
             currCard.rotation.z = 0;
-            currCard.position.y = player.s1;
+            currCard.position.y = player.spawnP1;
             currCard.rotation.y = player.rotation;
-            player.index = -2;
-            player.time = time;
-            player.s1 += 0.01;
+            // Resetting index to get the rest of the cards
+            player.index = -1;
+            // Increasing the height where cards should come back to
+            player.spawnP1 += 0.01;
+            // Going to the next card
             this.deckCount++
-            this.currRotation = objects[this.deckCount].rotation.y;
-            player.drawBackPath.points[0] = objects[this.deckCount].position.clone();
-            player.drawBackPath.points[1] = objects[this.deckCount].position.clone();
-            player.drawBackPath.points[1].y = objects[this.deckCount].flipped ? 3 : 0;
-            player.drawBackPath.points[3].y = player.s1;
+            // Return true to keep the animation going
             return true;
         }
-        currCard.rotation.z = 0;
         currCard.flipped = false;
-        currCard.position.y = player.s1;
+        // Making sure last card is places properly
+        currCard.position.copy(player.drawBackPath.getPointAt(1));
+        currCard.rotation.z = 0;
+        currCard.position.y = player.spawnP1;
         currCard.rotation.y = player.rotation;
-        objects[this.deckCount].position.copy(player.drawBackPath.getPointAt(1));
+        // Resetting all player settings
         player.index = -1;
         this.deckCount = 0;
-        player.s1 = 0.005;
-        player.s2 = 0.005;
-        player.s3 = 0.005;
+        player.spawnP1 = 0.005;
+        player.spawnP2 = 0.005;
+        player.spawnP3 = 0.005;
 
+        // Stopping animation
         return false;
-
     }
 
     // Used to get the player that were doing the animation to
