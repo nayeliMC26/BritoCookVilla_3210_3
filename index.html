@@ -3,15 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>War Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="public/assets/textures/game.png" type="image/x-icon">
 </head>
 
 <body>
     <!-- Main project script. -->
     <script type="module" src="/src/js/Main.js"></script>
+    <!-- War PopUp -->
     <div id="warPopup"></div>
+
+    <!-- Initial GUI -->
+    <div class="gui-container" id="initialGUI">
+        <div id="guiCanvas">
+            <div class="gui-content">
+                <h1>War Game</h1>
+                <button id="startButton" class="menuButton">Start</button>
+                <button id="rulesButton" class="menuButton">Rules</button>
+                <button id="controlsButton" class="menuButton">Controls</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="content-container" id="rulesContainer">
+        <span class="closeX" id="closeRulesX">X</span>
+        <h2>Game Rules</h2>
+        <p>
+            1. EACH ARMY RECEIVES AN EQUAL NUMBER OF CARDS<br><br>
+            2. DURING EACH BATTLE EACH ARMY FLIPS A CARD FROM THEIR DECK.<br><br>
+            3. THE ARMY WITH THE HIGHEST CARD VALUE WINS THE BATTLE.<br><br>
+            4. IF TWO ARMIES HAVE THE SAME CARD VALUE, THEY GO TO WAR.<br>
+            <span class="small-text">WAR... WHAT IS IT GOOD FOR.</span><br>
+            5. IF ALL TROOPS ARE SEIZED FROM AN ARMY...<br>THEY LOSE THE WAR AND ARE... REMOVED<br><br>
+            6. ONCE AN ARMY HAS SEIZED ALL TROOPS, THEY WIN<br>
+            <span class="small-text">GOOD LUCK GENERAL...</span>
+        </p>
+    </div>
+
+    <!-- Controls -->
+    <div class="content-container" id="controlsContainer">
+        <span class="closeX" id="closeControlsX">X</span>
+        <h2>Game Controls</h2>
+        <p>
+            N = PLAY BATTLE <br>
+            M = TOGGLE SHADOWS <br>
+            L = TOGGLE AMBIENT LIGHT <br>
+            P = TOGGLE POINT LIGHT <br>
+            ESC = PAUSE GAME
+        </p>
+    </div>
+
+    <!-- Pause Menu -->
+    <div class="content-container" id="pauseMenu">
+        <span class="closeX" id="closePauseX">X</span>
+        <h2>Pause Menu</h2>
+        <button id="resumeButton" class="menuButton">Resume</button>
+        <!-- Rules and Controls buttons will be moved here when needed -->
+        <div id="pauseMenuButtons"></div>
+    </div>
 </body>
 
 </html>

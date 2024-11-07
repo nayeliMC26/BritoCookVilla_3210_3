@@ -17,6 +17,8 @@ class Main {
         this.prevWar = 0;
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
+        this.gameStarted = false;  // Flag to track if game has started
+        this.gamePaused = false;   // Flag to track if game is paused
         // Initializing the scene, renderer, and camera
         this.scene = new THREE.Scene();
 
@@ -61,12 +63,6 @@ class Main {
         const copyPass = new ShaderPass(CopyShader);
         copyPass.renderToScreen = true;
         this.composer.addPass(copyPass);
-
-        const gridHelper = new THREE.GridHelper(50, 50);
-        //this.scene.add(gridHelper);
-
-        const axisHelper = new THREE.AxesHelper(5);
-        //this.scene.add(axisHelper);
 
         this.ambientLight = new THREE.AmbientLight(0x00ffff, 0.5);
         this.scene.add(this.ambientLight);
@@ -147,7 +143,110 @@ class Main {
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keydown(event), false);
+
+        /*
+         * Adapted with the help of Chat GPT
+         */
+        // Adding event listeners for all of the CSS
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('startButton');
+            const rulesButton = document.getElementById('rulesButton');
+            const controlsButton = document.getElementById('controlsButton');
+            const rulesContainer = document.getElementById('rulesContainer');
+            const controlsContainer = document.getElementById('controlsContainer');
+            const initialGUI = document.getElementById('initialGUI');
+            const guiCanvas = document.getElementById('guiCanvas');
+            const closeRulesX = document.getElementById('closeRulesX');
+            const closeControlsX = document.getElementById('closeControlsX');
+            const pauseMenu = document.getElementById('pauseMenu');
+            const resumeButton = document.getElementById('resumeButton');
+            const closePauseX = document.getElementById('closePauseX');
+            const pauseMenuButtons = document.getElementById('pauseMenuButtons');
+
+            // Start Game Button: Hide initial GUI and show game canvas
+            startButton.addEventListener('click', () => {
+                initialGUI.style.display = 'none';
+                guiCanvas.style.display = 'block';
+                this.gameStarted = true;
+            });
+
+            // Show Rules container
+            function showRules() {
+                initialGUI.style.display = 'none';
+                pauseMenu.style.display = 'none';
+                rulesContainer.style.display = 'block';
+                rulesContainer.classList.add('show');
+            }
+
+            // Show Controls container
+            function showControls() {
+                initialGUI.style.display = 'none';
+                pauseMenu.style.display = 'none';
+                controlsContainer.style.display = 'block';
+                controlsContainer.classList.add('show');
+            }
+
+            // Hide Rules and show initial GUI or pause menu
+            closeRulesX.addEventListener('click', () => {
+                rulesContainer.classList.remove('show');
+                rulesContainer.style.display = 'none';
+                if (this.gamePaused) {
+                    pauseMenu.style.display = 'block';
+                } else {
+                    initialGUI.style.display = 'block';
+                }
+            });
+
+            // Hide Controls and show initial GUI or pause menu
+            closeControlsX.addEventListener('click', () => {
+                controlsContainer.classList.remove('show');
+                controlsContainer.style.display = 'none';
+                if (this.gamePaused) {
+                    pauseMenu.style.display = 'block';
+                } else {
+                    initialGUI.style.display = 'block';
+                }
+            });
+
+            // Attach event listeners for Rules and Controls buttons
+            rulesButton.addEventListener('click', showRules);
+            controlsButton.addEventListener('click', showControls);
+
+            // If user presses escape then show pause menu
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && this.gameStarted) {
+                    this.togglePauseMenu();
+                }
+            });
+
+            // Resume game from the pause menu
+            resumeButton.addEventListener('click', () => {
+                this.togglePauseMenu();
+            });
+            closePauseX.addEventListener('click', () => {
+                this.togglePauseMenu();
+            });
+        });
     }
+
+    togglePauseMenu() {
+        if (!this.gameStarted) return; 
+    
+        this.gamePaused = !this.gamePaused;
+        pauseMenu.style.display = this.gamePaused ? "block" : "none";
+        pauseMenu.classList.toggle("show", this.gamePaused);
+    
+        if (this.gamePaused) {
+            // Move the rules and controls buttons to the pause menu
+            pauseMenuButtons.appendChild(rulesButton);
+            pauseMenuButtons.appendChild(controlsButton);
+        } else {
+            // Move buttons back to their original position in the initial GUI
+            document.querySelector(".gui-content").appendChild(rulesButton);
+            document.querySelector(".gui-content").appendChild(controlsButton);
+        }
+    }
+    
 
     loadTableEdge() {
         // Create a loader for the GLTF/GLB model
@@ -384,12 +483,14 @@ class Main {
                 break;
             case "n":
                 if (this.game.gameActive && (this.animationState == 'idle')) {
+
                     this.game.playRound();
                     this.cards = this.game.comparisonPool;
                     this.animationState = 'draw';
                 } else if (this.animationState == 'idle') {
                     console.log("The game has ended. You cannot play anymore.");
                 }
+            }
                 break;
             case "p":
                 this.pointLight.visible = !this.pointLight.visible;
