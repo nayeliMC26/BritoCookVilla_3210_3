@@ -96,6 +96,9 @@ class Main {
         // Add the spotlight to the scene
         this.scene.add(this.spotlight);
 
+        // Music by juniorsoundays from Pixabay
+        this.playSound('public/assets/sounds/gameSoundtrack.mp3');
+
         const video = document.createElement("video");
         video.src = "public/assets/textures/table/tableScreen.mp4";
         video.load();
@@ -460,6 +463,23 @@ class Main {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // A function to play audio files
+    // Function adapted from William Huynh on Project CSC3210_2
+    playSound(audioFile) {
+        const listener = new THREE.AudioListener();
+        this.camera.add(listener)
+        // Create a global audio source
+        const sound = new THREE.Audio(listener);
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load(audioFile, function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(false);
+            sound.setVolume(0.5);
+            sound.play();
+            sound.setLoop(true);
+        });
     }
 
     keydown(event) {
