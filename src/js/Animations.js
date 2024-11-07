@@ -95,55 +95,49 @@ export class Animations {
         this.currRotation = 0;
     }
 
-    flipCard(player, object, war, time) {
+    flipCard(player, card, warCards, time) {
         // Getting player
         player = this.#getPlayer(player);
-        if ((player === undefined) || object === undefined) {
+        if ((player === undefined) || card === undefined) {
             return false;
         }
         // if this is the first call of the funtion
         if (player.index === -1) {
+            // start time of animation
             player.time = time;
             // Set the start of the path to the objects location
-            player.flipPath.points[0] = (object.position.clone());
+            player.flipPath.points[0] = (card.position.clone());
         }
         // Index used to track where were moving the object to (the percentage of the path)
         const currIndex = ((time - player.time) / 200 % 4) / 4;
-        // const currIndex = ((time - player.time) * 2 % 4) / 4;
-        // If the animation has not started to loop
-        if ((currIndex > player.index) && !object.flipped) {
+        // If the animation has not started to loop and card is not flipped
+        if ((currIndex > player.index) && !card.flipped) {
             // Get the vertex at the current index
             const position = player.flipPath.getPointAt(currIndex);
             // Move the object to the current index position
-            object.position.copy(position);
-            // If were more than 25% into the line
+            card.position.copy(position);
+            // Rotate the object (flipping) ff were more than 25% into the line
             if (currIndex >= 0.25) {
-                // Rotate the object (flipping)
-                // Math.PI * the percentage of the rest of the path
-                object.rotation.z = Math.PI * ((currIndex - 0.25) / 0.75);
+                card.rotation.z = Math.PI * ((currIndex - 0.25) / 0.75);
             }
-            // Updating the player index to the current index
             player.index = currIndex;
-            // Return treu to keep the animation going
+            // Return true to keep the animation going
             return true
-        } else if (!object.flipped) {
-            object.flipped = true;
-            // Else when the aimation start to loop 
-            // Move object to the end of the line
-            object.position.copy(player.flipPath.getPointAt(1));
-            // Move object to the correct height of the stack
-            object.position.y = player.spawnP3;
+        } else if (!card.flipped) {
+            card.flipped = true;
+            // Making sure card is placed properly at the end
+            card.position.copy(player.flipPath.getPointAt(1));
+            card.rotation.z = Math.PI;
+            card.position.y = player.spawnP3;
             player.spawnP3 += 0.01;
-            // Make sure the object is flipped correctly
-            object.rotation.z = Math.PI;
-            // Reseting the player index
+            // Setting player index to be ready in case of war
             player.index = -2;
         }
-        // Retunr false to stop animation
-        return this.war(player.number, war, time);
+        // Call war animation to be make sure we dont skip it
+        return this.#war(player.number, warCards, time);
     }
 
-    war(player, cards, time) {
+    #war(player, cards, time) {
         // Getting player 
         player = this.#getPlayer(player);
         if (player === undefined) {
@@ -181,7 +175,6 @@ export class Animations {
         }
         // Index used to track where were moving the object to (the percentage of the path)
         const currIndex = ((time - player.time) / 200 % 4) / 4;
-        // const currIndex = ((time - player.time) * 2 % 4) / 4;
         // If the animation has not started to loop and count can be found in the cards
         if ((currIndex > player.index) && (player.count < cards.length)) {
             const position = player.path.getPointAt(currIndex);
@@ -228,7 +221,6 @@ export class Animations {
         }
         // Index used to track where were moving the object to (perctange of distance to desired height)
         const currIndex = ((time - player.time) / 150 % 3) / 3;
-        // const currIndex = ((time - player.time) * 2 % 3) / 3;
         // If the animation has not started to loop
         if (currIndex > player.index) {
             if (player.index === -1) player.index = 0;
@@ -276,7 +268,6 @@ export class Animations {
 
         // Index used to track where were moving the object to (the percentage of the path)
         const currIndex = ((time - player.time) / 250 % 5) / 5;
-        // const currIndex = ((time - player.time) % 5) / 5;
         // If the animation has not started to loop and deckCount can be found in the cards
         if ((currIndex > player.index) && (this.deckCount < cards.length)) {
             // Get the vertex at the current index

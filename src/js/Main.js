@@ -129,6 +129,10 @@ class Main {
         tableTop.translateY(-1.75 / 2);
         this.scene.add(tableTop);
 
+        this.loadTableEdge();
+        this.loadDrone();
+        this.createWarPlane();
+
         // Object to call different animations
         this.Animations = new Animations(this.scene);
 
@@ -266,7 +270,6 @@ class Main {
     // Our animate function
     animate(time) {
         this.stats.begin();
-        this.controls.update();
         if ((this.game.removedPlayerId === 2)) {
             this.indexTWO = -1;
             this.indexTHREE = 1;
@@ -361,28 +364,17 @@ class Main {
     }
 
     keydown(event) {
-        switch (event.keyCode) {
-            case 78: // N
-                if (this.game.gameActive && (this.animationState == 'idle')) {
-                    this.game.playRound();
-                    this.cards = this.game.comparisonPool;
-                    this.animationState = 'draw';
-                } else if (this.animationState == 'idle') {
-                    console.log("The game has ended. You cannot play anymore.");
-                }
-                break;
+        switch (event.key.toLowerCase()) {
             case "a":
                 if (this.pointLight.visible) {
                     this.pointLight.position.x -= 0.5;
                 }
                 break;
-
             case "d":
                 if (this.pointLight.visible) {
                     this.pointLight.position.x += 0.5;
                 }
                 break;
-
             case "l":
                 this.ambientLight.visible = !this.ambientLight.visible;
                 break;
@@ -391,11 +383,11 @@ class Main {
                 this.spotlight.castShadow = !this.spotlight.castShadow;
                 break;
             case "n":
-                if (this.game.gameActive) {
+                if (this.game.gameActive && (this.animationState == 'idle')) {
                     this.game.playRound();
-                    this.game.compareCard();
-                    console.log("Game state:", this.game, "\n\n");
-                } else {
+                    this.cards = this.game.comparisonPool;
+                    this.animationState = 'draw';
+                } else if (this.animationState == 'idle') {
                     console.log("The game has ended. You cannot play anymore.");
                 }
                 break;
