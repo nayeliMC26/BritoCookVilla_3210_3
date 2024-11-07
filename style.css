@@ -52,6 +52,7 @@ h1 {
     text-shadow: 0 0 1px #fff, 0 0 15px #89fdff, 0 0 30px #89fdff;
     opacity: 0.9;
     margin-top: 0;
+    white-space: nowrap
 }
 
 /* Canvas Background */
