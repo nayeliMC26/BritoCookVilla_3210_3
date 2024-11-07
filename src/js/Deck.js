@@ -73,7 +73,7 @@ class Deck {
         this.cards.forEach((card, index) => {
             card.position.x = position.x;
             // Slight offset to mimic "stack" effect on deck
-            card.position.y = position.y + index * 0.01;;
+            card.position.y = position.y - index * 0.01;;
             card.position.z = position.z;
             card.rotation.set(0, Math.PI / 2, 0);
 

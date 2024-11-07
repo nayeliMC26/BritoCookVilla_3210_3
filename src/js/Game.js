@@ -37,11 +37,11 @@ class Game {
         // Create a list of vectors for player positions
         var playerPositions = [
             // Player 1 position
-            new THREE.Vector3(-14, 0, 0),
+            new THREE.Vector3(-14, 0.175, 0),
             // Player 2 position 
-            new THREE.Vector3(14, 0, 0),
+            new THREE.Vector3(14, 0.175, 0),
             // Player 3 position
-            new THREE.Vector3(0, 0, -14)
+            new THREE.Vector3(0, 0.175, -14)
         ];
         // For each player, set the playerDeck's position
         this.playerDecks.forEach((deck, index) => {

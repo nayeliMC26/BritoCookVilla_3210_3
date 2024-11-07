@@ -17,13 +17,14 @@ class Card extends THREE.Mesh {
         frontTexture.colorSpace = THREE.SRGBColorSpace;
 
         // Create materials for each side of the box: [Right, Left, Top, Bottom, Front, Back]
+        const color = 0xffffff * Math.random()
         const materials = [
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Right side
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Left side
+            new THREE.MeshBasicMaterial({ color: color }), // Right side
+            new THREE.MeshBasicMaterial({ color: color }), // Left side
             new THREE.MeshBasicMaterial({ map: backTexture }), // Top side
             new THREE.MeshBasicMaterial({ map: frontTexture }), // Bottom side
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Front face
-            new THREE.MeshBasicMaterial({ color: 0xffffff }), // Back face
+            new THREE.MeshBasicMaterial({ color: color }), // Front face
+            new THREE.MeshBasicMaterial({ color: color }), // Back face
         ];
 
         // Pass geometry and materials to the super constructor

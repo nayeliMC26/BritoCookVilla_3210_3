@@ -144,7 +144,7 @@ class Main {
 
         window.addEventListener('resize', () => this.onWindowResize(), false);
         window.addEventListener('keydown', (event) => this.keydown(event), false);
-
+        this.test = true;
     }
 
     // Our animate function
@@ -153,26 +153,31 @@ class Main {
         this.controls.update();
         switch (this.animationState) {
             case 'draw':
-                var i = this.Animations.flipCard("ONE", this.cards[0], time);
-                var ii = this.Animations.flipCard("TWO", this.cards[1], time);
-                var iii = this.Animations.flipCard("THREE", this.cards[2], time);
-                console.log((i || ii || iii));
+                var i = this.Animations.flipCard("ONE", this.game.comparisonPool[0], this.game.warCards, time);
+                var ii = this.Animations.flipCard("TWO", this.game.comparisonPool[1], this.game.warCards, time);
+                var iii = this.Animations.flipCard("THREE", this.game.comparisonPool[2], this.game.warCards, time);
+                // console.log((i || ii || iii));
                 if (!(i || ii || iii)) {
                     this.winningPlayer = this.game.winningPlayerId;
                     this.cardsWon = this.game.winningPool.length
+                    console.log("update");
                 }
                 this.animationState = (i || ii || iii) ? 'draw' : 'lift';
+                // this.animationState = (i || ii || iii) ? 'draw' : 'idle';
                 break;
             case 'lift':
                 var id = this.winningPlayer;
-                var i = this.Animations.liftDeck(id, this.game.playerDecks[id - 1].cards.slice(0, this.cardsWon * -1), time);
-                console.log(i);
+                console.log(id - 1);
+                var deck = this.game.playerDecks[id - 1].cards.slice(0, this.cardsWon * -1);
+                // console.log(`DECK ${id}: `, deck);
+                var i = this.Animations.liftDeck(id, deck, this.game.winningPool.length, time);
+                // console.log(i);
                 this.animationState = (i) ? 'lift' : 'drawBack';
                 break;
             case 'drawBack':
                 var id = this.winningPlayer;
-                var i = this.Animations.drawBack(id, this.game.winningPool, time);
-                console.log(i);
+                var i = this.Animations.drawBack(id, this.game.winningPool.toReversed(), time);
+                // console.log(i);
                 this.animationState = (i) ? 'drawBack' : 'idle';
                 break;
         }
@@ -191,8 +196,9 @@ class Main {
     keydown(event) {
         switch (event.keyCode) {
             case 78: // N
-                if (this.game.gameActive && (this.animationState == 'idle')) {
-                    this.cards = this.game.playRound();
+                if (this.game.gameActive && (this.animationState == 'idle') && (this.test)) {
+                    this.game.playRound();
+                    this.cards = this.game.comparisonPool;
                     // this.game.compareCard();
                     this.animationState = 'draw';
                 } else if (this.animationState == 'idle') {
