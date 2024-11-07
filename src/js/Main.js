@@ -230,12 +230,12 @@ class Main {
     }
 
     togglePauseMenu() {
-        if (!this.gameStarted) return; 
-    
+        if (!this.gameStarted) return;
+
         this.gamePaused = !this.gamePaused;
         pauseMenu.style.display = this.gamePaused ? "block" : "none";
         pauseMenu.classList.toggle("show", this.gamePaused);
-    
+
         if (this.gamePaused) {
             // Move the rules and controls buttons to the pause menu
             pauseMenuButtons.appendChild(rulesButton);
@@ -246,7 +246,7 @@ class Main {
             document.querySelector(".gui-content").appendChild(controlsButton);
         }
     }
-    
+
 
     loadTableEdge() {
         // Create a loader for the GLTF/GLB model
@@ -490,7 +490,6 @@ class Main {
                 } else if (this.animationState == 'idle') {
                     console.log("The game has ended. You cannot play anymore.");
                 }
-            }
                 break;
             case "p":
                 this.pointLight.visible = !this.pointLight.visible;
