@@ -97,10 +97,10 @@ class Main {
         this.scene.add(this.spotlight);
 
         // Music by juniorsoundays from Pixabay
-        this.playSound('public/assets/sounds/gameSoundtrack.mp3');
+        this.playSound('./assets/sounds/gameSoundtrack.mp3');
 
         const video = document.createElement("video");
-        video.src = "public/assets/textures/table/tableScreen.mp4";
+        video.src = "./assets/textures/table/tableScreen.mp4";
         video.load();
         video.loop = true;
         video.muted = true;
@@ -256,7 +256,7 @@ class Main {
         const loader = new GLTFLoader();
 
         // Path to the GLB model
-        const modelPath = "public/assets/models/TableEdge.glb";
+        const modelPath = "./assets/models/TableEdge.glb";
 
         // Load the GLB file
         loader.load(
@@ -323,7 +323,7 @@ class Main {
         const loader = new GLTFLoader();
 
         // Path to the GLB model
-        const modelPath = "public/assets/models/Drone.glb";
+        const modelPath = "./assets/models/Drone.glb";
 
         // Load the GLB file
         loader.load(
