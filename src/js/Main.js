@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { Animations } from "./Animations.js";
 import Game from "./Game.js";
@@ -14,6 +13,8 @@ import { CopyShader } from "three/examples/jsm/shaders/CopyShader.js";
 
 class Main {
     constructor() {
+        this.warPopup = document.getElementById("warPopup");
+        this.prevWar = 0;
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
         // Initializing the scene, renderer, and camera
@@ -31,29 +32,35 @@ class Main {
         this.clock = new THREE.Clock();
 
         this.camera = new THREE.PerspectiveCamera(
-            65,
+            50,
             window.innerWidth / window.innerHeight,
             0.1,
             3000
         );
-        this.camera.position.set(0, 20, 30);
+        this.camera.position.set(0, 25, 45);
         this.camera.lookAt(0, 0, 0);
         this.scene.add(this.camera);
 
-        this.controls = new OrbitControls(
-            this.camera,
-            this.renderer.domElement
+        // Create the EffectComposer
+        this.composer = new EffectComposer(this.renderer);
+
+        // Create the RenderPass
+        const renderPass = new RenderPass(this.scene, this.camera);
+        this.composer.addPass(renderPass);
+
+        // Create the UnrealBloomPass for bloom effect
+        this.bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight), // Resolution
+            0.4, // Bloom strength
+            0.4, // Bloom radius
+            1.0 // Bloom threshold
         );
+        this.composer.addPass(this.bloomPass);
 
-        // Enable auto-rotation on the controls
-        this.controls.enableDamping = true; // Smooth transition when rotating
-        this.controls.dampingFactor = 0.25; // Adjust damping for a smoother effect
-        this.controls.enableZoom = true; // Enable zoom if needed
-        this.controls.autoRotate = true; // Enable auto-rotation
-        this.controls.autoRotateSpeed = -0.3; // Control the speed of the auto-rotation
-
-        // Set the center of the orbit (usually the center of the scene)
-        this.controls.target.set(0, 0, 0); // Look at the center
+        // Optional: Create a ShaderPass to copy the result to the screen
+        const copyPass = new ShaderPass(CopyShader);
+        copyPass.renderToScreen = true;
+        this.composer.addPass(copyPass);
 
         const gridHelper = new THREE.GridHelper(50, 50);
         //this.scene.add(gridHelper);
@@ -75,26 +82,23 @@ class Main {
         this.scene.add(this.pointLight);
 
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight);
-        //this.scene.add(this.pointLightHelper, 1.0)
-
-        //const testCard = new Card('3', 'diamonds', 0);
-        //this.scene.add(testCard);
 
         // Create a spotlight with white color and set its intensity
-        const spotlight = new THREE.SpotLight(0xffffff, 500); // Adjust intensity as needed
-        spotlight.position.set(0, 300, 0); // Position the spotlight above and to the side of the model
-        spotlight.angle = Math.PI / 4; // Spotlight spread angle
-        spotlight.penumbra = 0.5; // Soft edges
-        spotlight.decay = 1; // Decay rate, for realistic falloff
-        spotlight.distance = 400; // Maximum range of the light
+        this.spotlight = new THREE.SpotLight(0xffffff, 500); // Adjust intensity as needed
+        this.spotlight.position.set(0, 300, 0); // Position the spotlight above and to the side of the model
+        this.spotlight.angle = Math.PI / 4; // Spotlight spread angle
+        this.spotlight.penumbra = 0.5; // Soft edges
+        this.spotlight.decay = 1; // Decay rate, for realistic falloff
+        this.spotlight.distance = 400; // Maximum range of the light
+        this.spotlight.shadow.bias = -0.00005; // Prevents weird lines from appearing
 
         // Enable shadow casting
-        spotlight.castShadow = true;
-        spotlight.shadow.mapSize.width = 2048; // Shadow resolution
-        spotlight.shadow.mapSize.height = 2048;
+        this.spotlight.castShadow = true;
+        this.spotlight.shadow.mapSize.width = 2048; // Shadow resolution
+        this.spotlight.shadow.mapSize.height = 2048;
 
         // Add the spotlight to the scene
-        this.scene.add(spotlight);
+        this.scene.add(this.spotlight);
 
         const video = document.createElement("video");
         video.src = "public/assets/textures/table/tableScreen.mp4";
@@ -104,9 +108,7 @@ class Main {
         video.play();
 
         const videoTexture = new THREE.VideoTexture(video);
-
         const blackMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-
         const tableTopGeometry = new THREE.CylinderGeometry(18, 18, 1.75, 40);
 
         const tableTopMaterial = new THREE.MeshPhongMaterial({
@@ -129,6 +131,7 @@ class Main {
 
         this.loadTableEdge();
         this.loadDrone();
+        this.createWarPlane();
 
         // Temporary Cards
         const geometry = new THREE.BoxGeometry(2.5, 0.02, 3.5);
@@ -216,27 +219,6 @@ class Main {
         this.t5 = false;
         this.t6 = false;
 */
-
-        // Create the EffectComposer
-        this.composer = new EffectComposer(this.renderer);
-
-        // Create the RenderPass
-        const renderPass = new RenderPass(this.scene, this.camera);
-        this.composer.addPass(renderPass);
-
-        // Create the UnrealBloomPass for bloom effect
-        this.bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight), // Resolution
-            0.4, // Bloom strength
-            0.4, // Bloom radius
-            1.0 // Bloom threshold
-        );
-        this.composer.addPass(this.bloomPass);
-
-        // Optional: Create a ShaderPass to copy the result to the screen
-        const copyPass = new ShaderPass(CopyShader);
-        copyPass.renderToScreen = true;
-        this.composer.addPass(copyPass);
     }
 
     loadTableEdge() {
@@ -258,6 +240,11 @@ class Main {
 
                 // Traverse the model and identify materials that are emissive
                 model.traverse((object) => {
+                    if (object.isMesh) {
+                        object.castShadow = true; // Enable shadow casting for this mesh
+                        object.receiveShadow = true; // Enable shadow receiving for this mesh
+                    }
+
                     if (object.isMesh && object.material) {
                         const material = object.material;
 
@@ -272,6 +259,22 @@ class Main {
                             // If material is not emissive, ensure it doesn't have an emissive color
                             material.emissive.set(0x000000); // Ensuring non-emissive materials have black emissive value
                         }
+                    }
+
+                    if (
+                        object.material &&
+                        object.material.name === "Material.003"
+                    ) {
+                        object.material.roughness = 0.0; // Very glossy
+                        object.material.metalness = 0.1; // Slightly metallic, adjust if needed
+                    }
+
+                    if (
+                        object.material &&
+                        object.material.name === "Material.001"
+                    ) {
+                        object.material.roughness = 0.5; // Some roughness for the brushed look
+                        object.material.metalness = 0.7; // Fully metallic
                     }
                 });
 
@@ -312,10 +315,33 @@ class Main {
         );
     }
 
+    createWarPlane() {
+        // Create the plane geometry (same width and length as the table)
+        const planeGeometry = new THREE.CylinderGeometry(18, 18, 0.1); // Adjust size to match the table
+
+        // Create a transparent red material
+        const redMaterial = new THREE.MeshPhongMaterial({
+            color: 0xff0000, // Red color
+            opacity: 0.6, // Transparent
+            emissive: 0xffffff,
+            emissiveIntensity: 0.5,
+            transparent: true, // Enable transparency
+            depthTest: true,
+            depthWrite: true,
+        });
+
+        // Create the plane mesh and position it above the table
+        this.warPlane = new THREE.Mesh(planeGeometry, redMaterial);
+        this.warPlane.position.set(0, -0.04, 0); // Position it above the table (adjust the y value to match the table height)
+        this.warPlane.visible = false; // Start with the plane hidden
+
+        // Add the plane to the scene
+        this.scene.add(this.warPlane);
+    }
+
     // Our animate function
     animate(time) {
         this.stats.begin();
-        this.controls.update();
         if (this.t1) {
             this.t1 = this.Animations.flipCard("ONE", this.card6, time);
         }
@@ -325,32 +351,58 @@ class Main {
         if (this.t3) {
             this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
         }
+        var curWar = this.game.warCount;
 
-        this.updateEmissions();  // Always call this during war
-        //this.updateEmissions();
+        if (this.game.getWarStatus() && this.prevWar != curWar) {
+            this.prevWar = this.game.warCount;
+            this.showWarPopUp();
+        }
+
+        this.updateEmissions();
 
         this.composer.render();
-        // this.renderer.render(this.scene, this.camera);
         this.stats.end();
     }
 
+    showWarPopUp() {
+        // Set the popup text
+        console.log("Popup function called");
+        this.warPopup.innerText = `WW${this.game.warCount}`;
+        // Make the popup visible and start fade-in
+        this.warPopup.style.display = "block";
+        this.warPopup.style.opacity = "1";
+
+        // After 1.5 seconds, fade out the popup
+        setTimeout(() => {
+            this.warPopup.style.opacity = "0";
+            // After fade-out animation, hide it completely
+            setTimeout(() => {
+                this.warPopup.style.display = "none";
+            }, 500); // Match this to the CSS transition duration
+        }, 1500); // Display time
+    }
+
     updateEmissions() {
-        const color = this.game.getWarStatus()
-                        ? 0xfe4649
-                        : 0x73d2d9; // Red if war is true, teal blue if false
+        const color = this.game.getWarStatus() ? 0xfe4649 : 0x73d2d9; // Red if war is true, teal blue if false
         this.ambientLight.color.set(color);
+
+        if (this.game.war) {
+            this.warPlane.visible = true;
+        } else {
+            this.warPlane.visible = false;
+        }
 
         this.scene.traverse((object) => {
             if (object.isMesh && object.material) {
                 // If object material is emissive, change its color based on war state
-                if (object.material.emissive && object.material.emissive.getHex() != 0x000000) {
+                if (
+                    object.material.emissive &&
+                    object.material.emissive.getHex() != 0x000000
+                ) {
                     const color = this.game.getWarStatus()
                         ? 0xfeabad
                         : 0x73d2d9; // Red if war is true, teal blue if false
                     object.material.emissive.set(color);
-                    if (this.game.getWarStatus()) {
-                        console.log("HEY I WORK!")
-                    }
                 }
             }
         });
@@ -385,12 +437,12 @@ class Main {
                 break;
             case "a":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x += 0.5;
+                    this.pointLight.position.x -= 0.5;
                 }
                 break;
             case "d":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.x -= 0.5;
+                    this.pointLight.position.x += 0.5;
                 }
                 break;
             case "l":
@@ -398,6 +450,7 @@ class Main {
                 break;
             case "m":
                 this.pointLight.castShadow = !this.pointLight.castShadow;
+                this.spotlight.castShadow = !this.spotlight.castShadow;
                 break;
             case "n":
                 if (this.game.gameActive) {
@@ -413,12 +466,12 @@ class Main {
                 break;
             case "s":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z -= 0.5;
+                    this.pointLight.position.z += 0.5;
                 }
                 break;
             case "w":
                 if (this.pointLight.visible) {
-                    this.pointLight.position.z += 0.5;
+                    this.pointLight.position.z -= 0.5;
                 }
                 break;
         }

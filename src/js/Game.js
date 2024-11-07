@@ -181,11 +181,12 @@ class Game {
      * A function to initiate war status during the game
      */
     async warGame() {
-        await this.pause(5000); // Pause to see textures update
 
         console.log("Starting War...");
         // War is starting, incremenet the count
         this.warCount++;
+
+        await this.pause(5000); // Pause to see textures update
         // Push the original compared cards into the war cards array
         this.warCards.push(...this.comparisonPool);
         // Clear the comparison pool
