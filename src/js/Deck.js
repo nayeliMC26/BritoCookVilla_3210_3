@@ -69,14 +69,13 @@ class Deck {
      * @param {*} position 
      */
     setPosition(position) {
-        this.position = position;
+        this.position = position; 
         this.cards.forEach((card, index) => {
             card.position.x = position.x;
             // Slight offset to mimic "stack" effect on deck
-            card.position.y = position.y - index * 0.01;;
-            card.position.z = position.z;
-            card.rotation.set(0, Math.PI / 2, 0);
-
+            card.position.y = position.y + index * 0.015;;
+            card.position.z = position.z; 
+            card.rotation.set(Math.PI / 2, 0, Math.PI / 2);
         });
     }
 
@@ -104,7 +103,7 @@ class Deck {
         // If there are not any cards remaining in the player's, do not draw 
         return null;
     }
-
+    
     /**
      * A function which adds each card into the scene
      */
