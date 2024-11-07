@@ -6,12 +6,15 @@ class Game {
         this.scene = scene;
         // Game variables
         this.comparisonPool = [];
+        this.winningPool = [];
         this.warCards = [];
         this.winningPlayerId = null;
         this.war = false;
         // Counters
         this.roundCount = 0;
         this.warCount = 0;
+
+        this.removedPlayerId = 0;
         // Flag for userInput toggle
         this.gameActive = true;
         // Initializing the game
@@ -43,20 +46,23 @@ class Game {
         // Create a list of vectors for player positions
         var playerPositions = [
             // Player 1 position
-            new THREE.Vector3(-14, 0, 0),
-            // Player 2 position
-            new THREE.Vector3(14, 0, 0),
+            new THREE.Vector3(-14, 0.165, 0),
+            // Player 2 position 
+            new THREE.Vector3(14, 0.165, 0),
             // Player 3 position
-            new THREE.Vector3(0, 0, -14),
+            new THREE.Vector3(0, 0.165, -14)
+
         ];
         // For each player, set the playerDeck's position
         this.playerDecks.forEach((deck, index) => {
             deck.setPosition(playerPositions[index]);
             // Rotate Player 3's deck to face the appropriate direction
             if (index === 2) {
-                deck.cards.forEach((card) => {
-                    card.rotation.set(Math.PI / 2, 0, 0);
-                });
+
+                deck.cards.forEach(card => {
+                    card.rotation.set(0, Math.PI, 0);
+                })
+
             }
         });
     }
@@ -103,6 +109,7 @@ class Game {
         console.log("R O U N D:", this.roundCount + 1);
         // Initialize empty array to hold cards to compare
         this.comparisonPool = [];
+        this.warCards = [];
         // Do a check to make sure there are more than one players in the game
         if (this.checkGameState()) return;
         // FOr each player in the array of playerDecks
@@ -116,15 +123,21 @@ class Game {
                 this.comparisonPool.push(card);
             } else {
                 // If the player is out of cards, remove them and decrement the array of playerDecks
-                console.log(`Player ${playerDeck.playerId} removed`);
+
+                console.log(`Player ${playerDeck.playerId} removed`)
+                this.removedPlayerId = playerDeck.playerId;
+
                 this.playerDecks.splice(i, 1);
                 i--;
                 if (this.checkGameState()) return;
             }
         }
         // Round has ended, increment the count
-        this.roundCount++;
-        return this.comparisonPool;
+
+        this.roundCount++
+        this.compareCard();
+        return this.winningPool;
+
     }
     /**
      * A function that takes the comparisonPool and returns the position of the card with the highest value
@@ -180,13 +193,13 @@ class Game {
     /**
      * A function to initiate war status during the game
      */
-    async warGame() {
+    warGame() {
 
         console.log("Starting War...");
         // War is starting, incremenet the count
         this.warCount++;
 
-        await this.pause(5000); // Pause to see textures update
+        // await this.pause(5000); // Pause to see textures update
         // Push the original compared cards into the war cards array
         this.warCards.push(...this.comparisonPool);
         // Clear the comparison pool
@@ -228,16 +241,14 @@ class Game {
     playerWin(winningPlayerId) {
         if (this.comparisonPool.length > 0 || this.warCards.length > 0) {
             // Add all cards played into the winningPool including compared cards and fallen player cards
-            var winningPool = [...this.comparisonPool, ...this.warCards];
-            console.log(
-                `Player ${winningPlayerId} has won: ${winningPool.length} cards.`
-            );
+            this.winningPool = [...this.comparisonPool, ...this.warCards];
+            console.log(`Player ${winningPlayerId} has won: ${this.winningPool.length} cards.`)
             // For each playerDeck in the array of players
             for (let i = 0; i < this.playerDecks.length; i++) {
                 // If the current playersId is the same as the winningPLayer's Id
                 if (this.playerDecks[i].playerId === winningPlayerId) {
                     // Add the winningPool to the winning player's deck
-                    this.playerDecks[i].addCards(winningPool);
+                    this.playerDecks[i].addCards(this.winningPool);
                 }
                 console.log(
                     "Player",
@@ -246,9 +257,9 @@ class Game {
                     [...this.playerDecks[i].cards]
                 );
             }
-            // Reset the warCards array and the comparisonPool
-            this.comparisonPool = [];
-            this.warCards = [];
+            // // Reset the warCards array and the comparisonPool
+            // this.comparisonPool = [];
+            // this.warCards = [];
             this.totalCardsInPlay = this.calculateTotalCards();
         }
         console.log(
@@ -263,6 +274,12 @@ class Game {
      * @param {*} playerId
      */
     removePlayer(playerId) {
+        this.removedPlayerId = playerId;
+        console.log("")
+        console.log("")
+        console.log(playerId)
+        console.log("")
+        console.log("")
         // Iterate backwards through the array of plauyers
         for (var i = this.playerDecks.length - 1; i >= 0; i--) {
             // If the current player is the one that needs to be removed

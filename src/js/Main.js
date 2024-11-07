@@ -129,19 +129,20 @@ class Main {
         this.loadDrone();
         this.createWarPlane();
 
-
         // Object to call different animations
         this.Animations = new Animations(this.scene);
+
+        this.cards = [];
+        this.animationState = 'idle';
+        this.indexONE = 0;
+        this.indexTWO = 1;
+        this.indexTHREE = 2;
 
         this.game = new Game(this.scene);
         console.log("Game initialized:", this.game, "\n\n");
 
-        window.addEventListener("resize", () => this.onWindowResize(), false);
-        window.addEventListener(
-            "keydown",
-            (event) => this.keydown(event),
-            false
-        );
+        window.addEventListener('resize', () => this.onWindowResize(), false);
+        window.addEventListener('keydown', (event) => this.keydown(event), false);
 
         /*
          * Adapted with the help of Chat GPT
@@ -229,12 +230,12 @@ class Main {
     }
 
     togglePauseMenu() {
-        if (!this.gameStarted) return; 
-    
+        if (!this.gameStarted) return;
+
         this.gamePaused = !this.gamePaused;
         pauseMenu.style.display = this.gamePaused ? "block" : "none";
         pauseMenu.classList.toggle("show", this.gamePaused);
-    
+
         if (this.gamePaused) {
             // Move the rules and controls buttons to the pause menu
             pauseMenuButtons.appendChild(rulesButton);
@@ -245,7 +246,7 @@ class Main {
             document.querySelector(".gui-content").appendChild(controlsButton);
         }
     }
-    
+
 
     loadTableEdge() {
         // Create a loader for the GLTF/GLB model
@@ -368,15 +369,35 @@ class Main {
     // Our animate function
     animate(time) {
         this.stats.begin();
-        if (this.t1) {
-            this.t1 = this.Animations.flipCard("ONE", this.card6, time);
+        if ((this.game.removedPlayerId === 2)) {
+            this.indexTWO = -1;
+            this.indexTHREE = 1;
+        } else if (this.game.removedPlayerId === 1) {
+            this.indexONE = -1;
+            this.indexTWO = 0;
+            this.indexTHREE = 1;
         }
-        if (this.t2) {
-            this.t2 = this.Animations.war("ONE", this.card5, this.card4, time);
+        var id = this.game.winningPlayerId;
+        switch (this.animationState) {
+            case 'draw':
+                var i = this.Animations.flipCard("ONE", this.game.comparisonPool[this.indexONE], this.game.warCards, time);
+                var ii = this.Animations.flipCard("TWO", this.game.comparisonPool[this.indexTWO], this.game.warCards, time);
+                var iii = this.Animations.flipCard("THREE", this.game.comparisonPool[this.indexTHREE], this.game.warCards, time);
+                this.animationState = (i || ii || iii) ? 'draw' : 'lift';
+                break;
+            case 'lift':
+                if ((this.game.removedPlayerId === 2) && (id === 3)) {
+                    id--;
+                }
+                var index = (this.game.playerDecks.length === 2) && (this.game.removedPlayerId === 1) ? id - 2 : id - 1;
+                var deck = this.game.playerDecks[index].cards.slice(0, this.game.winningPool.length * -1);
+                this.animationState = this.Animations.liftDeck(id, deck, this.game.winningPool.length, time) ? 'lift' : 'drawBack';
+                break;
+            case 'drawBack':
+                this.animationState = this.Animations.drawBack(id, this.game.winningPool.toReversed(), time) ? 'drawBack' : 'idle';
+                break;
         }
-        if (this.t3) {
-            this.t3 = this.Animations.war("ONE", this.card3, this.card2, time);
-        }
+
         var curWar = this.game.warCount;
 
         if (this.game.getWarStatus() && this.prevWar != curWar) {
@@ -461,15 +482,14 @@ class Main {
                 this.spotlight.castShadow = !this.spotlight.castShadow;
                 break;
             case "n":
-                if(this.gameStarted && !this.gamePaused){
-                if (this.game.gameActive) {
+                if (this.game.gameActive && (this.animationState == 'idle')) {
+
                     this.game.playRound();
-                    this.game.compareCard();
-                    console.log("Game state:", this.game, "\n\n");
-                } else {
+                    this.cards = this.game.comparisonPool;
+                    this.animationState = 'draw';
+                } else if (this.animationState == 'idle') {
                     console.log("The game has ended. You cannot play anymore.");
                 }
-            }
                 break;
             case "p":
                 this.pointLight.visible = !this.pointLight.visible;
