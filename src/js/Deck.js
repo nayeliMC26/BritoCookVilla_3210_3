@@ -19,7 +19,7 @@ class Deck {
         var Q = 12;
         var K = 13;
         // Nested for-loop which loops through the suits and the values in order to create the cards
-        this.suits = ["Clubs", "Diamonds", "Hearts", "Spades"];
+        this.suits = ["clubs", "diamonds", "hearts", "spades"];
         this.values = [A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K]
         // For each suit type in the array of suit types
         for (var suit of this.suits) {
