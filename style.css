@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
+/* Font by Ronin Design on DaFont: https://www.dafont.com/origin-tech.font*/
+@font-face {
+    font-family: "OriginTech";
+    src: url('public/assets/fonts/OriginTech personal use.ttf');
+}
+
+/* Font by MAKNA Studio on DaFont: https://www.dafont.com/glitch-inside.font*/
+@font-face {
+    font-family: "Glitch";
+    src: url('public/assets/fonts/Glitch inside.otf');
+}
+
 html,
 body {
     margin: 0;
@@ -10,92 +22,102 @@ body {
     position: relative;
 }
 
+/* War Popup */
 #warPopup {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(10, 10, 10, 0.9);
-    /* Darker with slight transparency */
-    color: #00ffea;
-    /* Neon cyan */
+    color: white;
     padding: 25px 50px;
     font-size: 32px;
-    /* Larger font size */
-    font-family: 'Orbitron', sans-serif;
-    /* Futuristic font */
+    font-family: OriginTech;
     text-align: center;
     border-radius: 12px;
     display: none;
     opacity: 0;
     transition: opacity 0.5s ease, transform 0.5s ease;
     box-shadow: 0 0 15px rgba(0, 255, 234, 0.7);
-    /* Neon glow effect */
+    text-shadow: 0 0 15px rgba(0, 255, 234, 0.7);
     border: 2px solid #00ffea;
-    /* Border to match neon glow */
 }
 
-/* Font by Albert Kalinggga on DaFont: https://www.dafont.com/warpen.font?text=Objects+in+Space&back=theme*/
-@font-face {
-    font-family: "Warpen";
-    src: url('assets/fonts/OriginTech personal use.ttf')
-}
-
+/* Title Styling */
 h1 {
-    font-family: 'Warpen';
+    font-family: OriginTech;
     letter-spacing: 5px;
     font-size: 60px;
     color: white;
-    text-shadow:
-        0 0 1px #fff,
-        0 0 15px #89fdff,
-        0 0 30px #89fdff;
+    text-shadow: 0 0 1px #fff, 0 0 15px #89fdff, 0 0 30px #89fdff;
     opacity: 0.9;
-    white-space: nowrap;
     margin-top: 0;
-    transform: translateY(-90px);
 }
 
+/* Canvas Background */
 #canvas {
-    background: linear-gradient(145deg, rgb(44, 84, 146)0%, rgb(45, 11, 65)100%);
     position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    display: block;
     z-index: 0;
 }
 
+/* Animation adapted from Jhey Thompkins on sitepoint https://www.sitepoint.com/recreate-the-cyberpunk-2077-button-glitch-effect-in-css/*/
+/* GUI Container with Glitch Effect */
 .gui-container {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    --clip-one: polygon(0 2%, 40% 2%, 40% 70%, 35% 70%, 35% 90%, 30% 90%, 30% 95%, 8% 95%, 0 70%);
+    --clip-two: polygon(0 78%, 40% 78%, 40% 90%, 35% 90%, 35% 95%, 30% 95%, 30% 100%, 8% 100%, 0 78%);
+    --clip-three: polygon(0 44%, 80% 44%, 80% 50%, 75% 50%, 75% 54%, 70% 54%, 70% 54%, 8% 54%, 0 54%);
+    --clip-four: polygon(0 0, 100% 0, 100% 0, 95% 0, 95% 0, 85% 0, 85% 0, 8% 0, 0 0);
+    --clip-five: polygon(0 0, 100% 0, 100% 0, 95% 0, 95% 0, 85% 0, 85% 0, 8% 0, 0 0);
+    --clip-six: polygon(0 40%, 100% 40%, 100% 60%, 93% 60%, 93% 85%, 85% 85%, 85% 85%, 8% 85%, 0 70%);
+    --clip-seven: polygon(0 63%, 100% 63%, 100% 70%, 93% 70%, 93% 80%, 85% 80%, 85% 80%, 8% 80%, 0 70%);
+    --shimmy-distance: 5px;
 }
 
-/*Image from Freepik: https://www.freepik.com/free-photos-vectors/space-background*/
+/* Glitch Effect on Hover */
+.gui-container:hover::before,
+.gui-container:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 10, 0.7);
+    clip-path: var(--clip-four);
+    animation: glitch 2s infinite linear;
+}
+
+/* GUI Canvas */
 #guiCanvas {
     border-radius: 45px;
     background-color: rgba(10, 10, 10, 0.95);
-    /* Darker with slight transparency */
     background-size: cover;
     width: 600px;
     height: 500px;
-    border-width: 10px;
+    border-width: 2px;
     border-style: solid;
-    color: #89fdff;
-    /* Neon cyan */
-    box-shadow: grey 5px 5px 20px 0px;
+    color: (137, 253, 255);
+    box-shadow: 0 0 15px rgba(137, 253, 255);
     display: block;
-    box-sizing: border-box;
     position: relative;
-
 }
 
+/* GUI Content */
 .gui-content {
-    color: #89fdff; /* Neon cyan */
+    color: rgb(137, 253, 255);
     text-align: center;
     position: absolute;
     top: 50%;
@@ -104,60 +126,176 @@ h1 {
     z-index: 11;
 }
 
-#startButton {
-    padding: 10px 20px;
-    font-size: 14px;
-    font-family: Warpen;
-    cursor: pointer;
-    border: none;
-    background-color: #89fdff; /* Neon cyan */
-    color: rgba(10, 10, 10, 0.9);
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    transform: translateY(-90px);
-    box-shadow:
-    0 0 2px #fff,
-    0 0 4px #89fdff,
-    0 0 6px #89fdff;
-    text-shadow:
-    0 0 1px #fff,
-    0 0 15px #89fdff,
-    0 0 30px #89fdff;
+/* Button Container */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
 }
 
-#startButton:hover {
+/* Menu Button */
+.menuButton {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family: OriginTech;
+    cursor: pointer;
+    border: none;
+    background-color: rgba(137, 253, 255, 0.5);
+    color: white;
+    border-radius: 5px;
+    margin: 10px;
+    transition: background-color 0.3s;
+    box-shadow: 0 0 2px #fff, 0 0 4px rgb(137, 253, 255), 0 0 6px rgb(137, 253, 255);
+}
+
+.menuButton:hover {
     background-color: rgb(200, 200, 200);
 }
 
-.pause-menu {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(39, 14, 94, 0.7);
+.content-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
-}
-
-.pause-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(10, 10, 10, 0.9);
+    color: #00ffea;
+    padding: 25px;
+    font-family: Glitch;
+    font-size: 18px;
+    border-radius: 12px;
     text-align: center;
-    color: white;
-    font-size: 24px;
-    font-family: DejaVu Sans Mono, monospace;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 0 15px rgba(137, 253, 255);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    justify-content: center;
 
 }
 
-#resumeButton {
-    padding: 10px 20px;
+/* Styling for the titles in rules and controls */
+.content-container h2 {
+    font-family: OriginTech;
+    /* Title font */
+    font-size: 40px;
+    color: white;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(0, 255, 234, 0.7);
+}
+
+/* Styling for the body text in rules and controls */
+.content-container p {
+    font-family: Glitch;
     font-size: 16px;
-    font-family: DejaVu Sans Mono, monospace;
+    color: #dcdbdb;
+    line-height: 1.5;
+    margin-top: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 234, 0.5);
+}
+/* Styling for the smaller "quote" text in the rules menu*/ 
+.small-text {
+    font-size: 0.6em;
+    font-style: italic;
+    color: #666;
+    text-shadow: none;
+}
+
+
+.content-container.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Style for the close button */
+.closeX {
+    font-family: OriginTech;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    color: rgba(0, 255, 234, 0.7);
     cursor: pointer;
-    border: none;
-    background-color: white;
-    color: black;
-    border-radius: 5px;
-    margin-top: 20px;
+    z-index: 20;
+    transition: color 0.3s ease;
+}
+
+.closeX:hover {
+    color: rgb(200, 200, 200);
+}
+
+/* The pause menu styling */
+#pauseMenu {
+    display: none;
+    opacity: 0;
+}
+
+#pauseMenu.show {
+    display: block;
+    opacity: 1;
+}
+/* Animation adapted from Jhey Thompkins on sitepoint https://www.sitepoint.com/recreate-the-cyberpunk-2077-button-glitch-effect-in-css/*/
+/* Glitch Keyframes */
+@keyframes glitch {
+    0% {
+        clip-path: var(--clip-one);
+    }
+    2%, 8% {
+        clip-path: var(--clip-two);
+        transform: translate(calc(var(--shimmy-distance) * -1), 0);
+    }
+    6% {
+        clip-path: var(--clip-two);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    9% {
+        clip-path: var(--clip-two);
+        transform: translate(0, 0);
+    }
+    10% {
+        clip-path: var(--clip-three);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    13% {
+        clip-path: var(--clip-three);
+        transform: translate(0, 0);
+    }
+    14%, 21% {
+        clip-path: var(--clip-four);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    25% {
+        clip-path: var(--clip-five);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    30% {
+        clip-path: var(--clip-five);
+        transform: translate(calc(var(--shimmy-distance) * -1), 0);
+    }
+    35%, 45% {
+        clip-path: var(--clip-six);
+        transform: translate(calc(var(--shimmy-distance) * -1), 0);
+    }
+    40% {
+        clip-path: var(--clip-six);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    50% {
+        clip-path: var(--clip-six);
+        transform: translate(0, 0);
+    }
+    55% {
+        clip-path: var(--clip-seven);
+        transform: translate(calc(var(--shimmy-distance) * 1), 0);
+    }
+    60% {
+        clip-path: var(--clip-seven);
+        transform: translate(0, 0);
+    }
+    100% {
+        clip-path: var(--clip-four);
+    }
 }
