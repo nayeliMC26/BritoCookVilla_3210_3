@@ -15,6 +15,8 @@ P = Toggle point light
 
 ESC = Pause the game
 
+WASD = Move the point light
+
 ## Resources
 
 ### Textures
