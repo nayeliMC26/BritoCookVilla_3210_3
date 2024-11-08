@@ -11,6 +11,36 @@
 </head>
 
 <body>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYqbrOqgHVGCThNxkv4PoVEmyKD8isJks",
+            authDomain: "war-game-be537.firebaseapp.com",
+            projectId: "war-game-be537",
+            storageBucket: "war-game-be537.firebasestorage.app",
+            messagingSenderId: "993130104611",
+            appId: "1:993130104611:web:52bc8240fe4c0669a22e96",
+            measurementId: "G-FQ9K4NK08M"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js"
+            }
+        }
+    </script>
     <!-- Main project script. -->
     <script type="module" src="/src/js/Main.js"></script>
     <!-- War PopUp -->
