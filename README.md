@@ -13,7 +13,7 @@ Card textures illustrated by <a href="https://github.com/scook5570" title="Saman
 
 
 ### Sounds
-
+Music by juniorsoundays from Pixabay
 
 ### Models
 Models created by <a href="https://github.com/scook5570" title="Samantha Cook"> Samantha Cook</a>
