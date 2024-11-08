@@ -16,8 +16,10 @@ Card textures illustrated by <a href="https://github.com/scook5570" title="Saman
 
 
 ### Models
-
+Models created by <a href="https://github.com/scook5570" title="Samantha Cook"> Samantha Cook</a>
 
 ### Fonts
+Ronin Design on DaFont: https://www.dafont.com/origin-tech.font
+MAKNA Studio on DaFont: https://www.dafont.com/glitch-inside.font
 
 
